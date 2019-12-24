@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/routes/route.dart';
-import 'package:rootron/stores/counter.dart';
 import 'package:rootron/stores/loginStore.dart';
 
 class OpenDoor extends StatelessWidget {
   OpenDoor({Key key}) : super(key: key);
-  final Counter counter = new Counter();
 
   @override
   Widget build(BuildContext context) {

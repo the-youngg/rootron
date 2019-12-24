@@ -41,8 +41,31 @@ class _CommunityAppState extends State<CommunityApp> {
 
       ///todo 判断token是否过期
       Provider.of<LoginStore>(context).isLogin = true;
+
+      _getUserInfo(auth.userId);
     }).catchError((error) {
       print('获取数据失败$error');
+    });
+  }
+
+  void _getUserInfo(int userId) {
+    var url = Global.rootronURL + '/users/$userId';
+    Dio dio = Dio();
+    dio.options.headers[HttpHeaders.authorizationHeader] = Global.token;
+    dio.options.responseType = ResponseType.json;
+    dio.options.contentType = "application/json";
+    dio.get(url).then((data) {
+      User user = User.fromJson(data.data);
+//      print(user.email);
+    });
+
+    var url2 = Global.rootronURL + '/houseInfos/?userId=$userId';
+    dio.get(url2).then((data) {
+      List list = json.decode(data.toString());
+      List<HouseInfos> houseInfoList =
+          list.map((m) => HouseInfos.fromJson(m)).toList();
+      HouseInfos houseInfos = houseInfoList.first;
+      print(houseInfoList);
     });
   }
 
