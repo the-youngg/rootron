@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "name": "花园小区",
+  "level": 0,
+  "doorIds": [
+    1,
+    2
+  ],
+  "positionIds": [
+    2
+  ]
+}

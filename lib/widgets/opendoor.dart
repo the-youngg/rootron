@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/counter.dart';
+import 'package:rootron/stores/loginStore.dart';
 
 class OpenDoor extends StatelessWidget {
   OpenDoor({Key key}) : super(key: key);
@@ -33,6 +35,7 @@ class OpenDoor extends StatelessWidget {
    * 开门按钮样式
    */
   Widget _openDoorButton(BuildContext context) {
+    LoginStore loginStore = Provider.of<LoginStore>(context);
     return new Container(
       margin: EdgeInsets.only(top: (MediaQuery.of(context).size.height) / 4),
       width: 180.0,
@@ -49,6 +52,7 @@ class OpenDoor extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(90.0))),
 //          color: Colors.blue,
           onPressed: () {
+            print("准备开门${loginStore.isLogin}");
             Navigator.pushNamed(context, CommunityRoute.login);
           },
           padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),

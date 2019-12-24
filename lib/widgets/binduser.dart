@@ -1,11 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:rootron/routes/route.dart';
-import 'package:rootron/utils/LocalStore.dart';
-
-import 'bindhouse.dart';
 
 class BindUser extends StatefulWidget {
   @override

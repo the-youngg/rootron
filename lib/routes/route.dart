@@ -33,7 +33,7 @@ List<CommunityRoute> _buildAllRoutes() {
         builderRoute: (BuildContext context) => OpenDoor()),
     CommunityRoute(
         routeName: CommunityRoute.login,
-        builderRoute: (BuildContext context) => const Login()),
+        builderRoute: (BuildContext context) => Login()),
     CommunityRoute(
         routeName: CommunityRoute.bindUser,
         builderRoute: (BuildContext context) => const BindUser()),
