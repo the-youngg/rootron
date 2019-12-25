@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/stores/counter.dart';
 import 'package:rootron/stores/loginStore.dart';
+import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/widgets/app.dart';
 
 void main() async {
@@ -18,6 +19,7 @@ void main() async {
       /// 命名时如果是单页面的数据管理则可以 xxx_mobx   如果是多页面的 xxx_store
       Provider<Counter>(create: (_) => Counter()),
       Provider<LoginStore>(create: (_) => LoginStore()),
+      Provider<UserStore>(create: (_) => UserStore()),
     ],
     child: CommunityApp(),
   ));

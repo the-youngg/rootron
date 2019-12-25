@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
+import 'package:rootron/models/house_entity.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/loginStore.dart';
+import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/LocalStore.dart';
 import 'package:rootron/utils/ProgressDialog.dart';
@@ -260,12 +262,13 @@ class _LoginState extends State<Login> {
     final ThemeData theme = Theme.of(context);
     final TextStyle dialogTextStyle =
         theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
-    const url = Global.rootronURL + '/authenticate';
-    HttpUtils.post(
-      url,
-      pathParams: null,
-      data: {"username": loginStore.username, "password": loginStore.password},
-    ).then((res) {
+    const url = '/authenticate';
+    var data = {
+      "username": loginStore.username,
+      "password": loginStore.password
+    };
+
+    Http.post(path: url, data: data).then((res) {
       var decode = json.encode(res);
       LocalStore.setLocalStorage('auth', decode).then((isOk) {
         if (isOk) {
