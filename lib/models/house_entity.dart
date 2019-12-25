@@ -1,13 +1,15 @@
+import 'package:rootron/models/position_entity.dart';
+
 class HouseEntity {
-  int positionId;
+  PositionEntity position;
   bool isBind;
   int id;
   int userId;
 
-  HouseEntity({this.positionId, this.isBind, this.id, this.userId});
+  HouseEntity({this.position, this.isBind, this.id, this.userId});
 
   HouseEntity.fromJson(Map<String, dynamic> json) {
-    positionId = json['positionId'];
+    position = json['position'];
     isBind = json['isBind'];
     id = json['id'];
     userId = json['userId'];
@@ -15,7 +17,7 @@ class HouseEntity {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['positionId'] = this.positionId;
+    data['position'] = this.position;
     data['isBind'] = this.isBind;
     data['id'] = this.id;
     data['userId'] = this.userId;

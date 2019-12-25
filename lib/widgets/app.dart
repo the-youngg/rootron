@@ -64,6 +64,7 @@ class _CommunityAppState extends State<CommunityApp> {
     /// 获取用户房屋信息
     var url2 = '/houseInfos/?userId=$userId';
     var res2 = await Http.get(path: url2);
+    print("**********$res2");
     HouseList houseList = HouseList.fromJson(res2);
     Provider.of<UserStore>(context).houseList = houseList;
 
@@ -77,39 +78,39 @@ class _CommunityAppState extends State<CommunityApp> {
         return;
       }
 
-      var url3 = '/positions/${house.positionId}';
-      var res3 = await Http.get(path: url3);
-      PositionEntity positionEntity = PositionEntity.fromJson(res3);
-      print("小区名字${positionEntity.name}");
-      print("小区的门${positionEntity.doorIds}");
-      print("小区的街道${positionEntity.positionIds}");
-      saveList.add(positionEntity.name);
-      saveList.add("dasda");
-
-      /// 获取小区下的街道
-      if (positionEntity.positionIds != null) {
-        positionEntity.positionIds.forEach((positionId) async {
-          var url3_1 = '/positions/$positionId';
-          var res3_1 = await Http.get(path: url3_1);
-          PositionEntity positionEntity1 = PositionEntity.fromJson(res3_1);
-          print("小区名字1 ${positionEntity.name + positionEntity1.name}");
-          print("小区的门1 ${positionEntity1.doorIds}");
-          print("小区的街道1 ${positionEntity1.positionIds}");
-          saveList.add(positionEntity.name + positionEntity1.name);
-
-          if (positionEntity1.positionIds != null) {
-            positionEntity1.positionIds.forEach((positionId) async {
-              var url3_2 = '/positions/$positionId';
-              var res3_2 = await Http.get(path: url3_2);
-              PositionEntity positionEntity2 = PositionEntity.fromJson(res3_2);
-              print(
-                  "小区名字2 ${positionEntity.name + positionEntity1.name + positionEntity2.name}");
-              print("小区的门2 ${positionEntity2.doorIds}");
-              print("小区的街道2 ${positionEntity2.positionIds}");
-            });
-          }
-        });
-      }
+//      var url3 = '/positions/${house.position.id}';
+//      var res3 = await Http.get(path: url3);
+//      PositionEntity positionEntity = PositionEntity.fromJson(res3);
+//      print("小区名字${positionEntity.name}");
+//      print("小区的门${positionEntity.doorIds}");
+//      print("小区的街道${positionEntity.positionIds}");
+//      saveList.add(positionEntity.name);
+//      saveList.add("dasda");
+//
+//      /// 获取小区下的街道
+//      if (positionEntity.positionIds != null) {
+//        positionEntity.positionIds.forEach((positionId) async {
+//          var url3_1 = '/positions/$positionId';
+//          var res3_1 = await Http.get(path: url3_1);
+//          PositionEntity positionEntity1 = PositionEntity.fromJson(res3_1);
+//          print("小区名字1 ${positionEntity.name + positionEntity1.name}");
+//          print("小区的门1 ${positionEntity1.doorIds}");
+//          print("小区的街道1 ${positionEntity1.positionIds}");
+//          saveList.add(positionEntity.name + positionEntity1.name);
+//
+//          if (positionEntity1.positionIds != null) {
+//            positionEntity1.positionIds.forEach((positionId) async {
+//              var url3_2 = '/positions/$positionId';
+//              var res3_2 = await Http.get(path: url3_2);
+//              PositionEntity positionEntity2 = PositionEntity.fromJson(res3_2);
+//              print(
+//                  "小区名字2 ${positionEntity.name + positionEntity1.name + positionEntity2.name}");
+//              print("小区的门2 ${positionEntity2.doorIds}");
+//              print("小区的街道2 ${positionEntity2.positionIds}");
+//            });
+//          }
+//        });
+//      }
       print("保存$saveList");
     });
 
