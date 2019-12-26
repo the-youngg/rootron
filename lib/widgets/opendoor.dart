@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:rootron/models/userInfo.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/userStore.dart';
+import 'package:rootron/utils/HttpUtils.dart';
+import 'package:rootron/utils/ToastUtil.dart';
+
+enum OpenStatus { close, opening, opened, failure }
 
 class OpenDoor extends StatefulWidget {
   OpenDoor({Key key}) : super(key: key);
@@ -12,25 +16,18 @@ class OpenDoor extends StatefulWidget {
 }
 
 class _OpenDoorState extends State<OpenDoor> {
+  //todo 用mobx
   String positionValue;
   String doorValue;
 
   List<String> positions;
   List<Door> doors;
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    positionValue = null;
-    doorValue = null;
-
-    positions = [];
-    doors = [];
-  }
+  OpenStatus openStatus = OpenStatus.close;
 
   @override
   Widget build(BuildContext context) {
+    print("##############" + DateTime.now().toString());
     UserStore userStore = Provider.of<UserStore>(context);
     positions = userStore.positionBindDoorList.keys.toList();
     if (positionValue == null) {
@@ -77,7 +74,10 @@ class _OpenDoorState extends State<OpenDoor> {
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: SizedBox(
+                            width: 100.0,
+                            child: Text(value),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -96,8 +96,11 @@ class _OpenDoorState extends State<OpenDoor> {
                       },
                       items: doors.map<DropdownMenuItem<String>>((Door value) {
                         return DropdownMenuItem<String>(
-                          value: value.name,
-                          child: Text(value.name),
+                          value: value.id.toString(),
+                          child: SizedBox(
+                            width: 100.0,
+                            child: Text(value.name),
+                          ),
                         );
                       }).toList(),
                     ),
@@ -122,7 +125,7 @@ class _OpenDoorState extends State<OpenDoor> {
       height: 180.0,
       decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
         BoxShadow(
-//          color: Colors.lightBlue,
+          color: Colors.lightBlue,
           blurRadius: 20,
           spreadRadius: 2,
         ),
@@ -130,7 +133,7 @@ class _OpenDoorState extends State<OpenDoor> {
       child: RaisedButton(
           shape: new RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(90.0))),
-//          color: Colors.blue,
+          color: _doorButtonColor(),
           onPressed: _openDoor,
           padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
           child: Text(
@@ -141,9 +144,75 @@ class _OpenDoorState extends State<OpenDoor> {
     );
   }
 
-  void _openDoor() {
-    print("positionValue$positionValue");
-    print("doorValue$doorValue");
-    Navigator.pushNamed(context, CommunityRoute.login);
+  /// 开门按钮的颜色
+  Color _doorButtonColor() {
+    var color;
+    switch (openStatus) {
+      case OpenStatus.close:
+        color = Colors.green;
+        break;
+      case OpenStatus.opening:
+        color = Colors.yellow;
+        break;
+      case OpenStatus.opened:
+        color = Colors.blue;
+        break;
+      case OpenStatus.failure:
+        color = Colors.red;
+        break;
+    }
+    return color;
+  }
+
+  /// 开门的方法
+  Future<void> _openDoor() async {
+    /// 验证
+    var isLogin = Provider.of<UserStore>(context).isLogin;
+    if (!isLogin) {
+      Navigator.pushNamed(context, CommunityRoute.login);
+      return;
+    }
+    if (doorValue == null) {
+      ToastUtil.show(context: context, msg: "请选择大门");
+      return;
+    }
+
+    /// 开始开门
+    ToastUtil.show(context: context, msg: "开门中...");
+    setState(() {
+      openStatus = OpenStatus.opening;
+    });
+    // 模拟等待
+    await Future.delayed(Duration(seconds: 2));
+    const url = '/openRecord';
+    var data = {
+      "type": "一键开门",
+      "positionId": 1,
+      "doorId": doorValue,
+      "applicant": Provider.of<UserStore>(context).currentUser.id,
+      "createTime": DateTime.now().toString(),
+      "updateTime": DateTime.now().toString()
+    };
+    Http.post(path: url, data: data).then((res) {
+      ToastUtil.show(context: context, msg: "开门成功");
+      setState(() {
+        openStatus = OpenStatus.opened;
+      });
+    }).catchError((onError) {
+      ToastUtil.show(context: context, msg: "开门失败");
+      setState(() {
+        openStatus = OpenStatus.failure;
+      });
+    }).whenComplete(() async {
+      await await Future.delayed(Duration(seconds: 2));
+      ToastUtil.show(context: context, msg: "重置");
+      setState(() {
+        openStatus = OpenStatus.close;
+      });
+    });
+
+    print("positionName: $positionValue");
+    print("doorId: $doorValue");
+    print("isLogin: $isLogin");
   }
 }

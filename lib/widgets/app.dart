@@ -68,9 +68,9 @@ class _CommunityAppState extends State<CommunityApp> {
     /// 遍历用户所拥有的房子
     houseInfos.houses.forEach((house) {
       // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
-      if (!house.isBind) {
-        return;
-      }
+//      if (!house.isBind) {
+//        return;
+//      }
 
       /// 获取level为0的信息
       positionName1 = house.position.name;
@@ -96,6 +96,7 @@ class _CommunityAppState extends State<CommunityApp> {
     });
 
     Provider.of<UserStore>(context).positionBindDoorList = map;
+    print("************" + DateTime.now().toString());
   }
 
   @override
