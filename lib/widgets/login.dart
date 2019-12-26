@@ -6,8 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:rootron/common/global.dart';
-import 'package:rootron/models/house_entity.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/userStore.dart';

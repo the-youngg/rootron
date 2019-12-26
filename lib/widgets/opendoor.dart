@@ -1,13 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rootron/models/userInfo.dart';
 import 'package:rootron/routes/route.dart';
-import 'package:rootron/stores/loginStore.dart';
+import 'package:rootron/stores/userStore.dart';
 
-class OpenDoor extends StatelessWidget {
+class OpenDoor extends StatefulWidget {
   OpenDoor({Key key}) : super(key: key);
 
   @override
+  _OpenDoorState createState() => _OpenDoorState();
+}
+
+class _OpenDoorState extends State<OpenDoor> {
+  String positionValue;
+  String doorValue;
+
+  List<String> positions;
+  List<Door> doors;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    positionValue = null;
+    doorValue = null;
+
+    positions = [];
+    doors = [];
+  }
+
+  @override
   Widget build(BuildContext context) {
+    UserStore userStore = Provider.of<UserStore>(context);
+    positions = userStore.positionBindDoorList.keys.toList();
+    if (positionValue == null) {
+      doors = List();
+    } else {
+      doors = userStore.positionBindDoorList[positionValue];
+    }
     return Scaffold(
       appBar: new AppBar(
 //          backgroundColor: Colors.white,
@@ -21,7 +51,60 @@ class OpenDoor extends StatelessWidget {
         child: new Column(
           children: <Widget>[
             _openDoorButton(context),
-            SelectDropDown(),
+            Padding(
+              padding: EdgeInsets.only(
+                  left: 50.0, top: 30.0, right: 50.0, bottom: 20.0),
+              child: new Column(
+                children: <Widget>[
+                  ListTile(
+                    title: new Text(
+                      '选择小区：',
+                    ),
+                    trailing: DropdownButton<String>(
+                      value: positionValue,
+                      hint: const Text('请选择'),
+                      onChanged: (String newValue) {
+                        if (doorValue != null) {
+                          setState(() {
+                            doorValue = null;
+                          });
+                        }
+                        setState(() {
+                          positionValue = newValue;
+                        });
+                      },
+                      items: positions
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  ListTile(
+                    title: new Text(
+                      '选择大门：',
+                    ),
+                    trailing: DropdownButton<String>(
+                      value: doorValue,
+                      hint: const Text('请选择'),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          doorValue = newValue;
+                        });
+                      },
+                      items: doors.map<DropdownMenuItem<String>>((Door value) {
+                        return DropdownMenuItem<String>(
+                          value: value.name,
+                          child: Text(value.name),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -33,7 +116,6 @@ class OpenDoor extends StatelessWidget {
    * 开门按钮样式
    */
   Widget _openDoorButton(BuildContext context) {
-    LoginStore loginStore = Provider.of<LoginStore>(context);
     return new Container(
       margin: EdgeInsets.only(top: (MediaQuery.of(context).size.height) / 4),
       width: 180.0,
@@ -49,10 +131,7 @@ class OpenDoor extends StatelessWidget {
           shape: new RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(90.0))),
 //          color: Colors.blue,
-          onPressed: () {
-            print("准备开门${loginStore.isLogin}");
-            Navigator.pushNamed(context, CommunityRoute.login);
-          },
+          onPressed: _openDoor,
           padding: EdgeInsets.only(left: 30, right: 30, top: 10, bottom: 10),
           child: Text(
             "OPEN",
@@ -61,68 +140,10 @@ class OpenDoor extends StatelessWidget {
           )),
     );
   }
-}
 
-class SelectDropDown extends StatefulWidget {
-  @override
-  _SelectDropDownState createState() => _SelectDropDownState();
-}
-
-class _SelectDropDownState extends State<SelectDropDown> {
-  String villageValue;
-  String gateValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding:
-          EdgeInsets.only(left: 50.0, top: 30.0, right: 50.0, bottom: 20.0),
-      child: new Column(
-        children: <Widget>[
-          ListTile(
-            title: new Text(
-              '选择小区：',
-            ),
-            trailing: DropdownButton<String>(
-              value: villageValue,
-              hint: const Text('请选择'),
-              onChanged: (String newValue) {
-                setState(() {
-                  villageValue = newValue;
-                });
-              },
-              items: <String>['天龙小区', '阳光小区', '湖畔小区', '花园小区']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-          ),
-          ListTile(
-            title: new Text(
-              '选择大门：',
-            ),
-            trailing: DropdownButton<String>(
-              value: gateValue,
-              hint: const Text('请选择'),
-              onChanged: (String newValue) {
-                setState(() {
-                  gateValue = newValue;
-                });
-              },
-              items: <String>['22座大门', '23座大门', '24座大门', '25座大门']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
+  void _openDoor() {
+    print("positionValue$positionValue");
+    print("doorValue$doorValue");
+    Navigator.pushNamed(context, CommunityRoute.login);
   }
 }

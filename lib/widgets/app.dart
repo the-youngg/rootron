@@ -4,10 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
-import 'package:rootron/models/door_entity.dart';
-import 'package:rootron/models/house_entity.dart';
 import 'package:rootron/models/index.dart';
-import 'package:rootron/models/position_entity.dart';
+import 'package:rootron/models/userInfo.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/userStore.dart';
@@ -28,99 +26,76 @@ class _CommunityAppState extends State<CommunityApp> {
   }
 
   /// 获取登录状态
-  void _getLoginStatus() {
-    LocalStore.getStringLocalStorage('auth').then((data) {
-      if (data == null) {
-        return;
-      }
-      Map<String, dynamic> responseJson = json.decode(data);
-      Auth auth = new Auth.fromJson(responseJson);
-      print("userId: ${auth.userId}");
-      print("token: ${auth.token}");
-      if (auth.token == null) {
-        return;
-      }
-      Global.token = "Bearer " + auth.token;
+  Future<void> _getLoginStatus() async {
+    var value = await LocalStore.getStringLocalStorage('auth');
+    Map<String, dynamic> responseJson = json.decode(value);
+    Auth auth = new Auth.fromJson(responseJson);
+    print(auth.token);
+    if (auth.token == null) {
+      return;
+    }
 
-      ///todo 判断token是否过期
-      Provider.of<LoginStore>(context).isLogin = true;
-      Provider.of<UserStore>(context).userId = auth.userId;
-      Provider.of<UserStore>(context).token = auth.token;
+    Global.token = "Bearer " + auth.token;
 
-      _getUserInfo(auth.userId);
-    }).catchError((error) {
-      print('获取数据失败$error');
-    });
+    ///todo 判断token是否过期
+    Provider.of<UserStore>(context).isLogin = true;
+    Provider.of<UserStore>(context).userId = auth.userId;
+    Provider.of<UserStore>(context).token = auth.token;
+
+    _getUserInfo(auth.userId);
   }
 
-  void _getUserInfo(int userId) async {
+  Future<void> _getUserInfo(int userId) async {
     /// 获取用户基本信息
     var url = '/users/$userId';
-    Http.get(path: url).then((data) {
-      User user = User.fromJson(data);
-      print(user.email);
-    });
+    var data = await Http.get(path: url);
+    User user = User.fromJson(data);
+    Provider.of<UserStore>(context).currentUser = user;
 
     /// 获取用户房屋信息
     var url2 = '/houseInfos/?userId=$userId';
     var res2 = await Http.get(path: url2);
-    print("**********$res2");
-    HouseList houseList = HouseList.fromJson(res2);
-    Provider.of<UserStore>(context).houseList = houseList;
+    HouseInfoList houseInfos = HouseInfoList.fromJson(res2);
 
-    /// 获取房子所在的小区位置
-    HouseList list = Provider.of<UserStore>(context).houseList;
-    list.houses.forEach((house) async {
-      List<String> saveList = [];
+    Map<String, List<Door>> map = Map();
+    var positionName1;
+    var positionName2;
+    var positionName3;
+    if (houseInfos.houses.length == 0) {
+      return;
+    }
 
+    /// 遍历用户所拥有的房子
+    houseInfos.houses.forEach((house) {
+      // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
       if (!house.isBind) {
-        /// todo 用户没有绑定该栋房屋，做其他处理
         return;
       }
 
-//      var url3 = '/positions/${house.position.id}';
-//      var res3 = await Http.get(path: url3);
-//      PositionEntity positionEntity = PositionEntity.fromJson(res3);
-//      print("小区名字${positionEntity.name}");
-//      print("小区的门${positionEntity.doorIds}");
-//      print("小区的街道${positionEntity.positionIds}");
-//      saveList.add(positionEntity.name);
-//      saveList.add("dasda");
-//
-//      /// 获取小区下的街道
-//      if (positionEntity.positionIds != null) {
-//        positionEntity.positionIds.forEach((positionId) async {
-//          var url3_1 = '/positions/$positionId';
-//          var res3_1 = await Http.get(path: url3_1);
-//          PositionEntity positionEntity1 = PositionEntity.fromJson(res3_1);
-//          print("小区名字1 ${positionEntity.name + positionEntity1.name}");
-//          print("小区的门1 ${positionEntity1.doorIds}");
-//          print("小区的街道1 ${positionEntity1.positionIds}");
-//          saveList.add(positionEntity.name + positionEntity1.name);
-//
-//          if (positionEntity1.positionIds != null) {
-//            positionEntity1.positionIds.forEach((positionId) async {
-//              var url3_2 = '/positions/$positionId';
-//              var res3_2 = await Http.get(path: url3_2);
-//              PositionEntity positionEntity2 = PositionEntity.fromJson(res3_2);
-//              print(
-//                  "小区名字2 ${positionEntity.name + positionEntity1.name + positionEntity2.name}");
-//              print("小区的门2 ${positionEntity2.doorIds}");
-//              print("小区的街道2 ${positionEntity2.positionIds}");
-//            });
-//          }
-//        });
-//      }
-      print("保存$saveList");
+      /// 获取level为0的信息
+      positionName1 = house.position.name;
+      map[positionName1] = house.position.doors;
+
+      /// 获取level为1的信息
+      if (house.position.positions.length == 0) {
+        return;
+      }
+      house.position.positions.forEach((position) {
+        positionName2 = position.name;
+        map[positionName1 + positionName2] = position.doors;
+
+        /// 获取level为2的信息
+        position.positions.forEach((position) {
+          positionName3 = position.name;
+          map[positionName1 + positionName2 + positionName3] = position.doors;
+
+          /// todo 获取level为...的信息
+          /// todo ...
+        });
+      });
     });
 
-    /// 获取小区下的门
-//      positionEntity.doorIds.forEach((doorId) async {
-//        var url4 = '/doors/$doorId';
-//        var res4 = await Http.get(path: url4);
-//        DoorEntity doorEntity = DoorEntity.fromJson(res4);
-//        print(doorEntity.name);
-//      });
+    Provider.of<UserStore>(context).positionBindDoorList = map;
   }
 
   @override
