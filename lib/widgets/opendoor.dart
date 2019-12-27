@@ -27,7 +27,6 @@ class _OpenDoorState extends State<OpenDoor> {
 
   @override
   Widget build(BuildContext context) {
-    print("##############" + DateTime.now().toString());
     UserStore userStore = Provider.of<UserStore>(context);
     positions = userStore.positionBindDoorList.keys.toList();
     if (positionValue == null) {
@@ -166,6 +165,10 @@ class _OpenDoorState extends State<OpenDoor> {
 
   /// 开门的方法
   Future<void> _openDoor() async {
+    setState(() {
+      openStatus = OpenStatus.close;
+    });
+
     /// 验证
     var isLogin = Provider.of<UserStore>(context).isLogin;
     if (!isLogin) {
@@ -198,6 +201,7 @@ class _OpenDoorState extends State<OpenDoor> {
       setState(() {
         openStatus = OpenStatus.opened;
       });
+      Navigator.pushNamed(context, CommunityRoute.openSuccess);
     }).catchError((onError) {
       ToastUtil.show(context: context, msg: "开门失败");
       setState(() {
@@ -205,7 +209,6 @@ class _OpenDoorState extends State<OpenDoor> {
       });
     }).whenComplete(() async {
       await await Future.delayed(Duration(seconds: 2));
-      ToastUtil.show(context: context, msg: "重置");
       setState(() {
         openStatus = OpenStatus.close;
       });

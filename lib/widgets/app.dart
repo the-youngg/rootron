@@ -96,7 +96,7 @@ class _CommunityAppState extends State<CommunityApp> {
     });
 
     Provider.of<UserStore>(context).positionBindDoorList = map;
-    print("************" + DateTime.now().toString());
+    print("************$map" + DateTime.now().toString());
   }
 
   @override
@@ -109,7 +109,7 @@ class _CommunityAppState extends State<CommunityApp> {
         accentColor: Colors.green,
       ),
       routes: _buildRoutes(),
-      initialRoute: '/',
+      initialRoute: CommunityRoute.openDoor,
     );
   }
 

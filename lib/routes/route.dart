@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rootron/widgets/bindhouse.dart';
 import 'package:rootron/widgets/binduser.dart';
 import 'package:rootron/widgets/login.dart';
+import 'package:rootron/widgets/openSuccess.dart';
 import 'package:rootron/widgets/opendoor.dart';
 
 class CommunityRoute {
@@ -23,6 +24,9 @@ class CommunityRoute {
 
   /// 绑定房屋
   static String bindHouse = '/bindHouse';
+
+  /// 开门成功
+  static String openSuccess = '/success';
 }
 
 /// 路由集合
@@ -40,6 +44,9 @@ List<CommunityRoute> _buildAllRoutes() {
     CommunityRoute(
         routeName: CommunityRoute.bindHouse,
         builderRoute: (BuildContext context) => const BindHouse()),
+    CommunityRoute(
+        routeName: CommunityRoute.openSuccess,
+        builderRoute: (BuildContext context) => OpenSuccess()),
   ];
 
   return communityRoutes;
