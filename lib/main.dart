@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/stores/counter.dart';
+import 'package:rootron/stores/doorStore.dart';
 import 'package:rootron/stores/loginStore.dart';
+import 'package:rootron/stores/registerStore.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/widgets/app.dart';
 
@@ -20,6 +22,8 @@ void main() async {
       Provider<Counter>(create: (_) => Counter()),
       Provider<LoginStore>(create: (_) => LoginStore()),
       Provider<UserStore>(create: (_) => UserStore()),
+      Provider<DoorStore>(create: (_) => DoorStore()),
+      Provider<RegisterStore>(create: (_) => RegisterStore()),
     ],
     child: CommunityApp(),
   ));

@@ -171,16 +171,20 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 5.0),
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      '忘记密码？',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ),
+                      padding: EdgeInsets.only(top: 5.0),
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () {
+                          _forgetPassword();
+                        },
+                        child: Text(
+                          '忘记密码？',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      )),
                   Container(
                     padding: EdgeInsets.only(top: 60.0),
                     child: RaisedButton(
@@ -192,7 +196,7 @@ class _LoginState extends State<Login> {
                       },
                       child: Text(
                         "登录",
-                        style: Theme.of(context).textTheme.title,
+                        style: TextStyle(color: Colors.white, fontSize: 18),
                       ),
                     ),
                   ),
@@ -204,7 +208,7 @@ class _LoginState extends State<Login> {
                         Text('新用户? '),
                         GestureDetector(
                           onTap: () {
-                            _register(context);
+                            _register();
                           },
                           child: Text(
                             '注册',
@@ -314,60 +318,64 @@ class _LoginState extends State<Login> {
     });
   }
 
-  // ignore: slash_for_doc_comments
-  /**
-   * 注册的方法
-   */
-  _register(BuildContext context) {
+  /// 注册的方法
+  _register() {
     Navigator.pushNamed(context, CommunityRoute.bindUser);
+  }
+
+  /// 忘记密码
+  _forgetPassword() {
+    Navigator.pushNamed(context, CommunityRoute.forgetPasswordPhone);
   }
 
   ///todo 公共方法
   Future<void> getUserInfo(int userId) async {
     /// 获取用户房屋信息
     var url2 = '/houseInfos/?userId=$userId';
-    var res2 = await Http.get(path: url2);
-    HouseInfoList houseInfos = HouseInfoList.fromJson(res2);
+    await Http.get(path: url2).then((res2) {
+      HouseInfoList houseInfos = HouseInfoList.fromJson(res2);
 
-    Map<String, List<Door>> map = Map();
-    var positionName1;
-    var positionName2;
-    var positionName3;
-    if (houseInfos.houses.length == 0) {
-      return;
-    }
+      Map<String, List<Door>> map = Map();
+      var positionName1;
+      var positionName2;
+      var positionName3;
+      if (houseInfos.houses.length == 0) {
+        return;
+      }
 
-    /// 遍历用户所拥有的房子
-    houseInfos.houses.forEach((house) {
-      // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
+      /// 遍历用户所拥有的房子
+      houseInfos.houses.forEach((house) {
+        // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
 //      if (!house.isBind) {
 //        return;
 //      }
 
-      /// 获取level为0的信息
-      positionName1 = house.position.name;
-      map[positionName1] = house.position.doors;
+        /// 获取level为0的信息
+        positionName1 = house.position.name;
+        map[positionName1] = house.position.doors;
 
-      /// 获取level为1的信息
-      if (house.position.positions.length == 0) {
-        return;
-      }
-      house.position.positions.forEach((position) {
-        positionName2 = position.name;
-        map[positionName1 + positionName2] = position.doors;
+        /// 获取level为1的信息
+        if (house.position.positions.length == 0) {
+          return;
+        }
+        house.position.positions.forEach((position) {
+          positionName2 = position.name;
+          map[positionName1 + positionName2] = position.doors;
 
-        /// 获取level为2的信息
-        position.positions.forEach((position) {
-          positionName3 = position.name;
-          map[positionName1 + positionName2 + positionName3] = position.doors;
+          /// 获取level为2的信息
+          position.positions.forEach((position) {
+            positionName3 = position.name;
+            map[positionName1 + positionName2 + positionName3] = position.doors;
 
-          /// todo 获取level为...的信息
-          /// todo ...
+            /// todo 获取level为...的信息
+            /// todo ...
+          });
         });
       });
-    });
 
-    Provider.of<UserStore>(context).positionBindDoorList = map;
-    print("************$map" + DateTime.now().toString());
+      Provider.of<UserStore>(context).positionBindDoorList = map;
+    }).catchError((error) {
+      print(error);
+    });
   }
 }

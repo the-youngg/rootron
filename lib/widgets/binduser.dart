@@ -62,16 +62,14 @@ class _BindUserState extends State<BindUser> {
                         fontWeight: FontWeight.w500),
                   ),
                   new Expanded(
-                    child: Observer(
-                      builder: (_) => TextField(
-                        onChanged: (text) {
-                          registerStore.username = text;
-                        },
-                        decoration: InputDecoration(
-                          hintText: '请输入用户名',
-                          hintStyle: new TextStyle(
-                              fontSize: 14, color: Colors.grey[400]),
-                        ),
+                    child: TextField(
+                      onChanged: (text) {
+                        registerStore.username = text;
+                      },
+                      decoration: InputDecoration(
+                        hintText: '请输入用户名',
+                        hintStyle: new TextStyle(
+                            fontSize: 14, color: Colors.grey[400]),
                       ),
                     ),
                   ),
@@ -86,33 +84,29 @@ class _BindUserState extends State<BindUser> {
                         color: Colors.teal,
                         fontWeight: FontWeight.w500),
                   ),
-                  Observer(
-                    builder: (_) => Expanded(
-                      child: Observer(
-                        builder: (_) => TextField(
-                          obscureText: registerStore.isObscureText,
-                          onChanged: (text) {
-                            registerStore.password = text;
+                  Expanded(
+                    child: TextField(
+                      obscureText: registerStore.isObscureText,
+                      onChanged: (text) {
+                        registerStore.password = text;
+                      },
+                      decoration: InputDecoration(
+                        hintText: '请输入密码',
+                        hintStyle: new TextStyle(
+                            fontSize: 14, color: Colors.grey[400]),
+                        suffixIcon: GestureDetector(
+                          dragStartBehavior: DragStartBehavior.down,
+                          onTap: () {
+                            registerStore.isObscureText =
+                                !registerStore.isObscureText;
                           },
-                          decoration: InputDecoration(
-                            hintText: '请输入密码',
-                            hintStyle: new TextStyle(
-                                fontSize: 14, color: Colors.grey[400]),
-                            suffixIcon: GestureDetector(
-                              dragStartBehavior: DragStartBehavior.down,
-                              onTap: () {
-                                registerStore.isObscureText =
-                                    !registerStore.isObscureText;
-                              },
-                              child: Icon(
-                                registerStore.isObscureText
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                semanticLabel: registerStore.isObscureText
-                                    ? 'hide password'
-                                    : 'show password',
-                              ),
-                            ),
+                          child: Icon(
+                            registerStore.isObscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            semanticLabel: registerStore.isObscureText
+                                ? 'hide password'
+                                : 'show password',
                           ),
                         ),
                       ),
@@ -130,23 +124,22 @@ class _BindUserState extends State<BindUser> {
                         fontWeight: FontWeight.w500),
                   ),
                   new Expanded(
-                    child: Observer(
-                      builder: (_) => TextField(
-                        keyboardType: TextInputType.phone,
-                        onChanged: (text) {
-                          registerStore.tel = text;
-                        },
-                        decoration: InputDecoration(
-                          hintText: '请输入手机号',
-                          hintStyle: new TextStyle(
-                              fontSize: 14, color: Colors.grey[400]),
-                        ),
+                    child: TextField(
+                      keyboardType: TextInputType.phone,
+                      onChanged: (text) {
+                        registerStore.tel = text;
+                      },
+                      decoration: InputDecoration(
+                        hintText: '请输入手机号',
+                        hintStyle: new TextStyle(
+                            fontSize: 14, color: Colors.grey[400]),
                       ),
                     ),
                   ),
                   Observer(
-                    builder: (_) => Container(
-                      width: 120,
+                    builder: (_) => SizedBox(
+                      height: 40,
+                      width: 124.0,
                       child: FlatButton(
                         disabledColor: Colors.grey.withOpacity(0.1),
                         //按钮禁用时的颜色
@@ -188,18 +181,16 @@ class _BindUserState extends State<BindUser> {
                         fontWeight: FontWeight.w500),
                   ),
                   new Expanded(
-                    child: Observer(
-                      builder: (_) => TextField(
-                        maxLength: 6,
-                        keyboardType: TextInputType.number,
-                        onChanged: (text) {
-                          registerStore.smsCode = text;
-                        },
-                        decoration: InputDecoration(
-                          hintText: '请输入验证码',
-                          hintStyle: new TextStyle(
-                              fontSize: 14, color: Colors.grey[400]),
-                        ),
+                    child: TextField(
+                      maxLength: 6,
+                      keyboardType: TextInputType.number,
+                      onChanged: (text) {
+                        registerStore.smsCode = text;
+                      },
+                      decoration: InputDecoration(
+                        hintText: '请输入验证码',
+                        hintStyle: new TextStyle(
+                            fontSize: 14, color: Colors.grey[400]),
                       ),
                     ),
                   ),
@@ -225,11 +216,7 @@ class _BindUserState extends State<BindUser> {
     );
   }
 
-  // ignore: slash_for_doc_comments
-  /**
-   * 发送验证码的方法
-   */
-
+  /// 发送验证码的方法
   void _sendSMSCode() {
     if (registerStore.isSmsButtonEnable) {
       ToastUtil.show(context: context, msg: "短信已发送, 默认：123456");

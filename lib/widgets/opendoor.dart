@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:rootron/common/global.dart';
 import 'package:rootron/models/userInfo.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/LocalStore.dart';
 import 'package:rootron/utils/ToastUtil.dart';
+import 'package:rootron/widgets/openSuccess.dart';
 
 enum OpenStatus { close, opening, opened, failure }
 
@@ -27,6 +29,8 @@ class _OpenDoorState extends State<OpenDoor> {
 
   OpenStatus openStatus = OpenStatus.close;
 
+  int last = 0;
+
   @override
   Widget build(BuildContext context) {
     UserStore userStore = Provider.of<UserStore>(context);
@@ -36,96 +40,100 @@ class _OpenDoorState extends State<OpenDoor> {
     } else {
       doors = userStore.positionBindDoorList[positionValue];
     }
-    return Scaffold(
-      appBar: new AppBar(
+    return WillPopScope(
+      onWillPop: _doubleClickBack,
+      child: Scaffold(
+        appBar: new AppBar(
 //          backgroundColor: Colors.white,
-        title: new Text(
-          '开门',
-          style: new TextStyle(fontWeight: FontWeight.bold),
+          title: new Text(
+            '开门',
+            style: new TextStyle(fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: new Center(
-        child: new Column(
-          children: <Widget>[
-            _openDoorButton(context),
-            Padding(
-              padding: EdgeInsets.only(
-                  left: 50.0, top: 30.0, right: 50.0, bottom: 20.0),
-              child: new Column(
-                children: <Widget>[
-                  ListTile(
-                    title: new Text(
-                      '选择小区：',
-                    ),
-                    trailing: DropdownButton<String>(
-                      value: positionValue,
-                      hint: const Text('请选择'),
-                      onChanged: (String newValue) {
-                        if (doorValue != null) {
+        body: new Center(
+          child: new Column(
+            children: <Widget>[
+              _openDoorButton(context),
+              Padding(
+                padding: EdgeInsets.only(
+                    left: 50.0, top: 30.0, right: 50.0, bottom: 20.0),
+                child: new Column(
+                  children: <Widget>[
+                    ListTile(
+                      title: new Text(
+                        '选择小区：',
+                      ),
+                      trailing: DropdownButton<String>(
+                        value: positionValue,
+                        hint: const Text('请选择'),
+                        onChanged: (String newValue) {
+                          if (doorValue != null) {
+                            setState(() {
+                              doorValue = null;
+                            });
+                          }
                           setState(() {
-                            doorValue = null;
+                            positionValue = newValue;
                           });
-                        }
-                        setState(() {
-                          positionValue = newValue;
-                        });
-                      },
-                      items: positions
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: SizedBox(
-                            width: 100.0,
-                            child: Text(value),
-                          ),
-                        );
-                      }).toList(),
+                        },
+                        items: positions
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: SizedBox(
+                              width: 100.0,
+                              child: Text(value),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: new Text(
-                      '选择大门：',
+                    ListTile(
+                      title: new Text(
+                        '选择大门：',
+                      ),
+                      trailing: DropdownButton<String>(
+                        value: doorValue,
+                        hint: const Text('请选择'),
+                        onChanged: (String newValue) {
+                          setState(() {
+                            doorValue = newValue;
+                          });
+                        },
+                        items:
+                            doors.map<DropdownMenuItem<String>>((Door value) {
+                          return DropdownMenuItem<String>(
+                            value: value.id.toString(),
+                            child: SizedBox(
+                              width: 100.0,
+                              child: Text(value.name),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                    trailing: DropdownButton<String>(
-                      value: doorValue,
-                      hint: const Text('请选择'),
-                      onChanged: (String newValue) {
-                        setState(() {
-                          doorValue = newValue;
-                        });
-                      },
-                      items: doors.map<DropdownMenuItem<String>>((Door value) {
-                        return DropdownMenuItem<String>(
-                          value: value.id.toString(),
-                          child: SizedBox(
-                            width: 100.0,
-                            child: Text(value.name),
-                          ),
-                        );
-                      }).toList(),
+                    SizedBox(
+                      height: 50.0,
                     ),
-                  ),
-                  SizedBox(
-                    height: 50.0,
-                  ),
-                  Observer(
-                      builder: (_) => userStore.isLogin
-                          ? RaisedButton(
-                              color: Colors.green,
-                              onPressed: () {
-                                _logOut();
-                              },
-                              child: Text(
-                                '退出登录',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            )
-                          : Text("")),
-                ],
+                    Observer(
+                        builder: (_) => userStore.isLogin
+                            ? RaisedButton(
+                                color: Colors.green,
+                                onPressed: () {
+                                  _logOut();
+                                },
+                                child: Text(
+                                  '退出登录',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              )
+                            : Text("")),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -219,7 +227,13 @@ class _OpenDoorState extends State<OpenDoor> {
       setState(() {
         openStatus = OpenStatus.opened;
       });
-      Navigator.pushNamed(context, CommunityRoute.openSuccess);
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return OpenSuccess(
+          /// 传给下个页面的参数
+          positionValue: positionValue,
+          doorValue: doorValue,
+        );
+      }));
     }).catchError((onError) {
       ToastUtil.show(context: context, msg: "开门失败");
       setState(() {
@@ -237,6 +251,7 @@ class _OpenDoorState extends State<OpenDoor> {
     print("isLogin: $isLogin");
   }
 
+  /// 退出登录
   void _logOut() {
     LocalStore.removeLocalStorage('auth');
     Provider.of<UserStore>(context).isLogin = false;
@@ -245,6 +260,23 @@ class _OpenDoorState extends State<OpenDoor> {
       positionValue = null;
     });
     Provider.of<UserStore>(context).positionBindDoorList = {};
+    Global.token = "";
     Navigator.pushNamed(context, CommunityRoute.login);
+  }
+
+  /// 双击返回键退出应用
+  Future<bool> _doubleClickBack() {
+    int when = 2000;
+    print('触发双击退出事件' + DateTime.now().toString());
+    //计算两次时间间隔
+    int now = DateTime.now().millisecondsSinceEpoch;
+    if (now - last >= when) {
+      last = DateTime.now().millisecondsSinceEpoch;
+      ToastUtil.show(
+          context: context, msg: '再次点击返回键退出应用', timeInSecForIos: when ~/ 1000);
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
   }
 }

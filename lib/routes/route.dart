@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:rootron/widgets/bindhouse.dart';
 import 'package:rootron/widgets/binduser.dart';
+import 'package:rootron/widgets/forgetPassword_phone.dart';
+import 'package:rootron/widgets/forgetPassword_smsCode.dart';
 import 'package:rootron/widgets/login.dart';
 import 'package:rootron/widgets/openSuccess.dart';
 import 'package:rootron/widgets/opendoor.dart';
+import 'package:rootron/widgets/resetPassword.dart';
 
 class CommunityRoute {
   const CommunityRoute({@required this.routeName, @required this.builderRoute})
@@ -27,6 +30,15 @@ class CommunityRoute {
 
   /// 开门成功
   static String openSuccess = '/success';
+
+  /// 找回密码 - 填写手机号
+  static String forgetPasswordPhone = '/forgetPasswordPhone';
+
+  /// 找回密码 - 填写验证码
+  static String forgetPasswordSmsCode = '/forgetPasswordSmsCode';
+
+  /// 重置密码
+  static String resetPassword = '/resetPassword';
 }
 
 /// 路由集合
@@ -47,6 +59,15 @@ List<CommunityRoute> _buildAllRoutes() {
     CommunityRoute(
         routeName: CommunityRoute.openSuccess,
         builderRoute: (BuildContext context) => OpenSuccess()),
+    CommunityRoute(
+        routeName: CommunityRoute.forgetPasswordPhone,
+        builderRoute: (BuildContext context) => ForgetPasswordPhone()),
+    CommunityRoute(
+        routeName: CommunityRoute.forgetPasswordSmsCode,
+        builderRoute: (BuildContext context) => ForgetPasswordSmsCode()),
+    CommunityRoute(
+        routeName: CommunityRoute.resetPassword,
+        builderRoute: (BuildContext context) => ResetPassword()),
   ];
 
   return communityRoutes;

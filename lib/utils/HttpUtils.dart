@@ -136,6 +136,7 @@ class Http {
     cancelToken,
   }) async {
     print('get请求启动! url：$path ,body: $pathParams');
+    print('token的值：${Global.token}');
     Response response;
 
     try {

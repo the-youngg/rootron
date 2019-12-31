@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class OpenSuccess extends StatelessWidget {
-  OpenSuccess({Key key}) : super(key: key);
+class OpenSuccess extends StatefulWidget {
+  final String positionValue;
+  final String doorValue;
 
+  OpenSuccess({Key key, this.positionValue, this.doorValue}) : super(key: key);
+
+  @override
+  _OpenSuccessState createState() => _OpenSuccessState();
+}
+
+class _OpenSuccessState extends State<OpenSuccess> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,13 +57,23 @@ class OpenSuccess extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text(
-                    "2019-12-27 16:04:30",
-                    style: TextStyle(fontSize: 16),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.0),
                   ),
-                  Text(
-                    "花园小区1街2栋4座大门",
-                    style: TextStyle(fontSize: 16),
+                  Expanded(
+                    child: Text(
+                      DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      widget.positionValue + widget.doorValue + "大门",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(right: 15.0),
                   ),
                 ],
               ),

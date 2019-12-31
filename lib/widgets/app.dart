@@ -60,49 +60,51 @@ class _CommunityAppState extends State<CommunityApp> {
   Future<void> _getUserInfo(int userId) async {
     /// 获取用户房屋信息
     var url2 = '/houseInfos/?userId=$userId';
-    var res2 = await Http.get(path: url2);
-    HouseInfoList houseInfos = HouseInfoList.fromJson(res2);
+    await Http.get(path: url2).then((res2) {
+      HouseInfoList houseInfos = HouseInfoList.fromJson(res2);
 
-    Map<String, List<Door>> map = Map();
-    var positionName1;
-    var positionName2;
-    var positionName3;
-    if (houseInfos.houses.length == 0) {
-      return;
-    }
+      Map<String, List<Door>> map = Map();
+      var positionName1;
+      var positionName2;
+      var positionName3;
+      if (houseInfos.houses.length == 0) {
+        return;
+      }
 
-    /// 遍历用户所拥有的房子
-    houseInfos.houses.forEach((house) {
-      // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
+      /// 遍历用户所拥有的房子
+      houseInfos.houses.forEach((house) {
+        // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
 //      if (!house.isBind) {
 //        return;
 //      }
 
-      /// 获取level为0的信息
-      positionName1 = house.position.name;
-      map[positionName1] = house.position.doors;
+        /// 获取level为0的信息
+        positionName1 = house.position.name;
+        map[positionName1] = house.position.doors;
 
-      /// 获取level为1的信息
-      if (house.position.positions.length == 0) {
-        return;
-      }
-      house.position.positions.forEach((position) {
-        positionName2 = position.name;
-        map[positionName1 + positionName2] = position.doors;
+        /// 获取level为1的信息
+        if (house.position.positions.length == 0) {
+          return;
+        }
+        house.position.positions.forEach((position) {
+          positionName2 = position.name;
+          map[positionName1 + positionName2] = position.doors;
 
-        /// 获取level为2的信息
-        position.positions.forEach((position) {
-          positionName3 = position.name;
-          map[positionName1 + positionName2 + positionName3] = position.doors;
+          /// 获取level为2的信息
+          position.positions.forEach((position) {
+            positionName3 = position.name;
+            map[positionName1 + positionName2 + positionName3] = position.doors;
 
-          /// todo 获取level为...的信息
-          /// todo ...
+            /// todo 获取level为...的信息
+            /// todo ...
+          });
         });
       });
-    });
 
-    Provider.of<UserStore>(context).positionBindDoorList = map;
-    print("************$map" + DateTime.now().toString());
+      Provider.of<UserStore>(context).positionBindDoorList = map;
+    }).catchError((error) {
+      print(error);
+    });
   }
 
   @override
@@ -113,6 +115,12 @@ class _CommunityAppState extends State<CommunityApp> {
           brightness: Brightness.light,
           primaryColor: Colors.green,
           accentColor: Colors.green,
+          buttonTheme: ButtonThemeData(
+              shape: StadiumBorder(side: BorderSide.none),
+              height: 50.0,
+              minWidth: double.infinity,
+              buttonColor: Colors.green,
+              textTheme: ButtonTextTheme.primary),
         ),
         routes: _buildRoutes(),
         initialRoute: CommunityRoute.openDoor,
