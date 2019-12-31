@@ -124,7 +124,7 @@ class Http {
     receiveTimeout: 3000,
 //    responseType: ResponseType.plain,
 //    contentType: "application/json",
-    headers: {HttpHeaders.authorizationHeader: Global.token},
+    headers: {HttpHeaders.authorizationHeader: "Bearer " + Global.token},
   );
 
   static Dio dio = Dio(options);

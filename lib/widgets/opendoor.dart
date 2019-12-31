@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/models/userInfo.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
+import 'package:rootron/utils/LocalStore.dart';
 import 'package:rootron/utils/ToastUtil.dart';
 
 enum OpenStatus { close, opening, opened, failure }
@@ -104,6 +106,22 @@ class _OpenDoorState extends State<OpenDoor> {
                       }).toList(),
                     ),
                   ),
+                  SizedBox(
+                    height: 50.0,
+                  ),
+                  Observer(
+                      builder: (_) => userStore.isLogin
+                          ? RaisedButton(
+                              color: Colors.green,
+                              onPressed: () {
+                                _logOut();
+                              },
+                              child: Text(
+                                '退出登录',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            )
+                          : Text("")),
                 ],
               ),
             ),
@@ -217,5 +235,16 @@ class _OpenDoorState extends State<OpenDoor> {
     print("positionName: $positionValue");
     print("doorId: $doorValue");
     print("isLogin: $isLogin");
+  }
+
+  void _logOut() {
+    LocalStore.removeLocalStorage('auth');
+    Provider.of<UserStore>(context).isLogin = false;
+    setState(() {
+      doorValue = null;
+      positionValue = null;
+    });
+    Provider.of<UserStore>(context).positionBindDoorList = {};
+    Navigator.pushNamed(context, CommunityRoute.login);
   }
 }

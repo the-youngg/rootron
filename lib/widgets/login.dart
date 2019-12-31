@@ -6,6 +6,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:rootron/common/global.dart';
+import 'package:rootron/models/index.dart';
+import 'package:rootron/models/userInfo.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/userStore.dart';
@@ -13,6 +16,7 @@ import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/LocalStore.dart';
 import 'package:rootron/utils/ProgressDialog.dart';
 import 'package:rootron/utils/ToastUtil.dart';
+import 'package:rootron/widgets/app.dart';
 
 enum DialogDemoAction {
   cancel,
@@ -268,9 +272,17 @@ class _LoginState extends State<Login> {
 
     Http.post(path: url, data: data).then((res) {
       var decode = json.encode(res);
+      Provider.of<UserStore>(context).isLogin = true;
+      Auth auth = new Auth.fromJson(res);
+      Global.token = auth.token;
+      print("token: ${Global.token}");
+      getUserInfo(auth.userId);
       LocalStore.setLocalStorage('auth', decode).then((isOk) {
         if (isOk) {
-          Navigator.pushNamed(context, CommunityRoute.bindUser);
+          Navigator.popUntil(
+            context,
+            ModalRoute.withName(CommunityRoute.openDoor),
+          );
         }
       });
     }).catchError((Object error) {
@@ -306,5 +318,56 @@ class _LoginState extends State<Login> {
   /**
    * 注册的方法
    */
-  _register(BuildContext context) {}
+  _register(BuildContext context) {
+    Navigator.pushNamed(context, CommunityRoute.bindUser);
+  }
+
+  ///todo 公共方法
+  Future<void> getUserInfo(int userId) async {
+    /// 获取用户房屋信息
+    var url2 = '/houseInfos/?userId=$userId';
+    var res2 = await Http.get(path: url2);
+    HouseInfoList houseInfos = HouseInfoList.fromJson(res2);
+
+    Map<String, List<Door>> map = Map();
+    var positionName1;
+    var positionName2;
+    var positionName3;
+    if (houseInfos.houses.length == 0) {
+      return;
+    }
+
+    /// 遍历用户所拥有的房子
+    houseInfos.houses.forEach((house) {
+      // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
+//      if (!house.isBind) {
+//        return;
+//      }
+
+      /// 获取level为0的信息
+      positionName1 = house.position.name;
+      map[positionName1] = house.position.doors;
+
+      /// 获取level为1的信息
+      if (house.position.positions.length == 0) {
+        return;
+      }
+      house.position.positions.forEach((position) {
+        positionName2 = position.name;
+        map[positionName1 + positionName2] = position.doors;
+
+        /// 获取level为2的信息
+        position.positions.forEach((position) {
+          positionName3 = position.name;
+          map[positionName1 + positionName2 + positionName3] = position.doors;
+
+          /// todo 获取level为...的信息
+          /// todo ...
+        });
+      });
+    });
+
+    Provider.of<UserStore>(context).positionBindDoorList = map;
+    print("************$map" + DateTime.now().toString());
+  }
 }

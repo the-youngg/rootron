@@ -27,31 +27,36 @@ class _CommunityAppState extends State<CommunityApp> {
 
   /// 获取登录状态
   Future<void> _getLoginStatus() async {
-    var value = await LocalStore.getStringLocalStorage('auth');
-    Map<String, dynamic> responseJson = json.decode(value);
-    Auth auth = new Auth.fromJson(responseJson);
-    print(auth.token);
-    if (auth.token == null) {
-      return;
-    }
+    await LocalStore.getStringLocalStorage('auth').then((value) {
+      Map<String, dynamic> responseJson = json.decode(value);
+      Auth auth = new Auth.fromJson(responseJson);
+      print(auth.token);
+      if (auth.token == null) {
+        return;
+      }
+      Global.token = auth.token;
 
-    Global.token = "Bearer " + auth.token;
+      ///todo 判断token是否过期
+      var url = '/users/${auth.userId}';
+      Http.get(path: url).then((data) {
+        User user = User.fromJson(data);
+        Provider.of<UserStore>(context).currentUser = user;
+        Provider.of<UserStore>(context).isLogin = true;
+        Provider.of<UserStore>(context).userId = auth.userId;
+        Provider.of<UserStore>(context).token = auth.token;
+        _getUserInfo(auth.userId);
+      }).catchError((error) {
+        Provider.of<UserStore>(context).isLogin = false;
+        print(error);
+      });
 
-    ///todo 判断token是否过期
-    Provider.of<UserStore>(context).isLogin = true;
-    Provider.of<UserStore>(context).userId = auth.userId;
-    Provider.of<UserStore>(context).token = auth.token;
-
-    _getUserInfo(auth.userId);
+    }).catchError((error) {
+      print(error);
+    });
   }
 
+  ///todo 公共方法
   Future<void> _getUserInfo(int userId) async {
-    /// 获取用户基本信息
-    var url = '/users/$userId';
-    var data = await Http.get(path: url);
-    User user = User.fromJson(data);
-    Provider.of<UserStore>(context).currentUser = user;
-
     /// 获取用户房屋信息
     var url2 = '/houseInfos/?userId=$userId';
     var res2 = await Http.get(path: url2);
