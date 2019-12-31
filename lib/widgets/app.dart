@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
 import 'package:rootron/models/index.dart';
@@ -9,6 +10,7 @@ import 'package:rootron/models/userInfo.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/userStore.dart';
+import 'package:rootron/utils/CommonLocalizationsDelegate.dart';
 import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/LocalStore.dart';
 
@@ -49,7 +51,6 @@ class _CommunityAppState extends State<CommunityApp> {
         Provider.of<UserStore>(context).isLogin = false;
         print(error);
       });
-
     }).catchError((error) {
       print(error);
     });
@@ -107,15 +108,26 @@ class _CommunityAppState extends State<CommunityApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CommunityApp',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.green,
-        accentColor: Colors.green,
-      ),
-      routes: _buildRoutes(),
-      initialRoute: CommunityRoute.openDoor,
-    );
+        title: 'CommunityApp',
+        theme: ThemeData(
+          brightness: Brightness.light,
+          primaryColor: Colors.green,
+          accentColor: Colors.green,
+        ),
+        routes: _buildRoutes(),
+        initialRoute: CommunityRoute.openDoor,
+        locale: Locale('zh', 'CN'),
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+
+          ///自定义代理，见下段代码
+          CommonLocalizationsDelegate(),
+        ],
+        supportedLocales: [
+          Locale('en', 'US'),
+          Locale('zh', 'CN'),
+        ]);
   }
 
   _buildRoutes() {
