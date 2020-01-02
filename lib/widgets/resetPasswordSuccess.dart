@@ -30,7 +30,10 @@ class ResetPasswordSuccess extends StatelessWidget {
             ),
             RaisedButton(
               onPressed: () {
-                Navigator.pushNamed(context, CommunityRoute.login);
+                Navigator.popUntil(
+                  context,
+                  ModalRoute.withName(CommunityRoute.login),
+                );
               },
               child: Text('立即登陆'),
             )

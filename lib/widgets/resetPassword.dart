@@ -87,7 +87,13 @@ class ResetPassword extends StatelessWidget {
             ),
             RaisedButton(
               onPressed: () {
-                Navigator.pushNamed(context, CommunityRoute.resetPasswordSuccess);
+                Navigator.pushNamed(
+                    context, CommunityRoute.resetPasswordSuccess);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  CommunityRoute.resetPasswordSuccess,
+                  ModalRoute.withName(CommunityRoute.login),
+                );
               },
               child: Text('确定'),
             )
