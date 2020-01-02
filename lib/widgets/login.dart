@@ -222,11 +222,27 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   Container(
-                    padding:
-                        EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
-                    child:
-                        Divider(height: 1.0, indent: 0.0, color: Colors.grey),
-                  ),
+                      padding:
+                          EdgeInsets.only(left: 20.0, right: 20.0, top: 30.0),
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Divider(
+                                height: 1.0, indent: 0.0, color: Colors.grey),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text("or"),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: Divider(
+                                height: 1.0, indent: 0.0, color: Colors.grey),
+                          )
+                        ],
+                      )),
                   Container(
                     padding: EdgeInsets.only(top: 20.0),
                     child: Row(
@@ -276,7 +292,6 @@ class _LoginState extends State<Login> {
 
     Http.post(path: url, data: data).then((res) {
       var decode = json.encode(res);
-      Provider.of<UserStore>(context).isLogin = true;
       Auth auth = new Auth.fromJson(res);
       Global.token = auth.token;
       print("token: ${Global.token}");
@@ -374,8 +389,10 @@ class _LoginState extends State<Login> {
       });
 
       Provider.of<UserStore>(context).positionBindDoorList = map;
+      Provider.of<UserStore>(context).isLogin = true;
     }).catchError((error) {
-      print(error);
+      print("获取房屋信息异常：$error");
+      ToastUtil.show(context: context, msg: "登录失败");
     });
   }
 }

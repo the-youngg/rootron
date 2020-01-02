@@ -124,7 +124,6 @@ class Http {
     receiveTimeout: 3000,
 //    responseType: ResponseType.plain,
 //    contentType: "application/json",
-    headers: {HttpHeaders.authorizationHeader: "Bearer " + Global.token},
   );
 
   static Dio dio = Dio(options);
@@ -135,6 +134,7 @@ class Http {
     options,
     cancelToken,
   }) async {
+    dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer " + Global.token;
     print('get请求启动! url：$path ,body: $pathParams');
     print('token的值：${Global.token}');
     Response response;
@@ -162,6 +162,7 @@ class Http {
     options,
     cancelToken,
   }) async {
+    dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer " + Global.token;
     print('post请求启动! url：$path ,body: $data');
     Response response;
 

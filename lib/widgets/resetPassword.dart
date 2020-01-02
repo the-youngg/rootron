@@ -15,11 +15,14 @@ class ResetPassword extends StatelessWidget {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Text(
-                  '新密码',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                SizedBox(
+                  width: 75,
+                  child: Text(
+                    '新密码',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 Padding(padding: EdgeInsets.only(left: 15.0)),
@@ -35,7 +38,7 @@ class ResetPassword extends StatelessWidget {
                           Icons.visibility,
                         ),
                       ),
-                      hintText: '  请输入新密码',
+                      hintText: '请输入新密码',
                       hintStyle:
                           TextStyle(fontSize: 16, color: Colors.grey[400]),
                     ),
@@ -48,11 +51,14 @@ class ResetPassword extends StatelessWidget {
             ),
             Row(
               children: <Widget>[
-                Text(
-                  '确认密码',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+                SizedBox(
+                  width: 75,
+                  child: Text(
+                    '确认密码',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 Padding(padding: EdgeInsets.only(left: 15.0)),
@@ -68,7 +74,7 @@ class ResetPassword extends StatelessWidget {
                           Icons.visibility,
                         ),
                       ),
-                      hintText: '  请再次输入新密码',
+                      hintText: '请再次输入新密码',
                       hintStyle:
                           TextStyle(fontSize: 16, color: Colors.grey[400]),
                     ),
@@ -80,7 +86,9 @@ class ResetPassword extends StatelessWidget {
               height: 50.0,
             ),
             RaisedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, CommunityRoute.resetPasswordSuccess);
+              },
               child: Text('确定'),
             )
           ],

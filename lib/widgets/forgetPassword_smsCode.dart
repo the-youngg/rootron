@@ -55,7 +55,6 @@ class ForgetPasswordSmsCode extends StatelessWidget {
                     splashColor: registerStore.isSmsButtonEnable
                         ? Colors.white.withOpacity(0.1)
                         : Colors.transparent,
-                    shape: StadiumBorder(side: BorderSide.none),
                     onPressed: () {},
                     child: Text(
                       '${registerStore.smsCodeButtonText}',

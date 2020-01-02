@@ -7,6 +7,7 @@ import 'package:rootron/widgets/login.dart';
 import 'package:rootron/widgets/openSuccess.dart';
 import 'package:rootron/widgets/opendoor.dart';
 import 'package:rootron/widgets/resetPassword.dart';
+import 'package:rootron/widgets/resetPasswordSuccess.dart';
 
 class CommunityRoute {
   const CommunityRoute({@required this.routeName, @required this.builderRoute})
@@ -39,6 +40,9 @@ class CommunityRoute {
 
   /// 重置密码
   static String resetPassword = '/resetPassword';
+
+  /// 重置密码成功
+  static String resetPasswordSuccess = 'resetPasswordSuccess';
 }
 
 /// 路由集合
@@ -68,6 +72,9 @@ List<CommunityRoute> _buildAllRoutes() {
     CommunityRoute(
         routeName: CommunityRoute.resetPassword,
         builderRoute: (BuildContext context) => ResetPassword()),
+    CommunityRoute(
+        routeName: CommunityRoute.resetPasswordSuccess,
+        builderRoute: (BuildContext context) => ResetPasswordSuccess()),
   ];
 
   return communityRoutes;
