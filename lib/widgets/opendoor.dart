@@ -201,6 +201,10 @@ class _OpenDoorState extends State<OpenDoor> {
       Navigator.pushNamed(context, CommunityRoute.login);
       return;
     }
+    if (positionValue == null) {
+      ToastUtil.show(context: context, msg: "请选择小区");
+      return;
+    }
     if (doorValue == null) {
       ToastUtil.show(context: context, msg: "请选择大门");
       return;

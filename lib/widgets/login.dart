@@ -295,6 +295,13 @@ class _LoginState extends State<Login> {
       Auth auth = new Auth.fromJson(res);
       Global.token = auth.token;
       print("token: ${Global.token}");
+
+      var url = '/users/${auth.userId}';
+      Http.get(path: url).then((data) {
+        User user = User.fromJson(data);
+        Provider.of<UserStore>(context).currentUser = user;
+      });
+
       getUserInfo(auth.userId);
       LocalStore.setLocalStorage('auth', decode).then((isOk) {
         if (isOk) {
