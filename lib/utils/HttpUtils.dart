@@ -181,4 +181,30 @@ class Http {
     }
     return response.data;
   }
+
+  static Future patch({
+    @required String path,
+    Map<String, dynamic> data = const {},
+    options,
+    cancelToken,
+  }) async {
+    dio.options.headers[HttpHeaders.authorizationHeader] = "Bearer " + Global.token;
+    print('post请求启动! url：$path ,body: $data');
+    Response response;
+
+    try {
+      response = await dio.patch(
+        path,
+        data: data,
+        cancelToken: cancelToken,
+      );
+      print('patch请求成功!response.data：${response.data}');
+    } on DioError catch (e) {
+      if (CancelToken.isCancel(e)) {
+        print('patch请求取消! ' + e.message);
+      }
+      print('patch请求发生错误：$e');
+    }
+    return response.data;
+  }
 }

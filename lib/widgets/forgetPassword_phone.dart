@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:rootron/models/index.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/stores/forgetPasswordStore.dart';
+import 'package:rootron/utils/HttpUtils.dart';
+import 'package:rootron/utils/ToastUtil.dart';
 
 class ForgetPasswordPhone extends StatelessWidget {
+  final ForgetPasswordStore forgetPasswordMobx = ForgetPasswordStore();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +33,10 @@ class ForgetPasswordPhone extends StatelessWidget {
                 Expanded(
                   child: TextField(
                     keyboardType: TextInputType.phone,
-                    onChanged: (text) {},
+                    inputFormatters: [LengthLimitingTextInputFormatter(11)],
+                    onChanged: (text) {
+                      forgetPasswordMobx.tel = text;
+                    },
                     decoration: InputDecoration(
                       hintText: '  请填写手机号',
                       hintStyle:
@@ -40,8 +51,7 @@ class ForgetPasswordPhone extends StatelessWidget {
             ),
             RaisedButton(
               onPressed: () {
-                Navigator.pushNamed(
-                    context, CommunityRoute.forgetPasswordSmsCode);
+                telIsExist(context);
               },
               child: Text('下一步'),
             )
@@ -49,5 +59,28 @@ class ForgetPasswordPhone extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// 判断手机号是否注册
+  void telIsExist(BuildContext context) {
+    ForgetPasswordStore forgetPasswordStore =
+        Provider.of<ForgetPasswordStore>(context);
+    if (forgetPasswordMobx.tel == null) {
+      ToastUtil.show(context: context, msg: "请输入手机号");
+      return;
+    }
+    var url = '/users/?tel=${forgetPasswordMobx.tel}';
+    Http.get(path: url).then((users) {
+      UserList userList = UserList.fromJson(users);
+      if (userList.users.length == 0) {
+        ToastUtil.show(context: context, msg: "手机号不存在");
+        return;
+      }
+      forgetPasswordStore.resetPasswordUser = userList.users.first;
+
+      ///fixme 这里是跨页面传值还是将输入的手机存入全局变量好？
+      forgetPasswordStore.tel = forgetPasswordMobx.tel;
+      Navigator.pushNamed(context, CommunityRoute.forgetPasswordSmsCode);
+    });
   }
 }

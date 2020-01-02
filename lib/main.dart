@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/stores/counter.dart';
 import 'package:rootron/stores/doorStore.dart';
+import 'package:rootron/stores/forgetPasswordStore.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/registerStore.dart';
 import 'package:rootron/stores/userStore.dart';
@@ -12,7 +13,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(MultiProvider(
-
     providers: [
       /// 将需要跨组件的store配置在下方
 //      ChangeNotifierProvider.value(value: theme),
@@ -24,6 +24,7 @@ void main() async {
       Provider<UserStore>(create: (_) => UserStore()),
       Provider<DoorStore>(create: (_) => DoorStore()),
       Provider<RegisterStore>(create: (_) => RegisterStore()),
+      Provider<ForgetPasswordStore>(create: (_) => ForgetPasswordStore()),
     ],
     child: CommunityApp(),
   ));
