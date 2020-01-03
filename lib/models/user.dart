@@ -1,20 +1,35 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'dart:convert' show json;
 
-part 'user.g.dart';
+import 'package:rootron/models/BaseModel.dart';
 
-@JsonSerializable()
-class User {
-  User();
-
-  num id;
-  String username;
+class User extends BaseModel {
+  String email;
   String password;
   String tel;
-  String email;
+  String username;
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  User.fromParams({this.email, this.password, this.tel, this.username});
 
-  Map<String, dynamic> toJson() => _$UserToJson(this);
+  factory User(jsonStr) => jsonStr == null
+      ? null
+      : jsonStr is String
+          ? new User.fromJson(json.decode(jsonStr))
+          : new User.fromJson(jsonStr);
+
+  User.fromJson(jsonRes) {
+    id = jsonRes['id'];
+    createTime = jsonRes['createTime'];
+    email = jsonRes['email'];
+    password = jsonRes['password'];
+    tel = jsonRes['tel'];
+    updateTime = jsonRes['updateTime'];
+    username = jsonRes['username'];
+  }
+
+  @override
+  String toString() {
+    return '{"id": $id,"createTime": ${createTime != null ? '${json.encode(createTime)}' : 'null'},"email": ${email != null ? '${json.encode(email)}' : 'null'},"password": ${password != null ? '${json.encode(password)}' : 'null'},"tel": ${tel != null ? '${json.encode(tel)}' : 'null'},"updateTime": ${updateTime != null ? '${json.encode(updateTime)}' : 'null'},"username": ${username != null ? '${json.encode(username)}' : 'null'}}';
+  }
 }
 
 class UserList {
