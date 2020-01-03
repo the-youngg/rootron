@@ -73,13 +73,15 @@ class Position extends BaseModel {
 
 class HouseInfo extends BaseModel {
   int userId;
+  int positionId;
   bool isBind;
 
-  HouseInfo.fromParams({this.userId, this.isBind});
+  HouseInfo.fromParams({this.userId, this.isBind, this.positionId});
 
   HouseInfo.fromJson(jsonRes) {
     id = jsonRes['id'];
     userId = jsonRes['userId'];
+    positionId = jsonRes['positionId'];
     isBind = jsonRes['isBind'];
     createTime = jsonRes['createTime'];
     updateTime = jsonRes['updateTime'];
@@ -87,30 +89,33 @@ class HouseInfo extends BaseModel {
 
   @override
   String toString() {
-    return '{"id": $id,"userId": $userId,"isBind": $isBind,"createTime": ${createTime != null ? '${json.encode(createTime)}' : 'null'},"updateTime": ${updateTime != null ? '${json.encode(updateTime)}' : 'null'}}';
+    return '{"id": $id,"positionId":$positionId,"userId": $userId,"isBind": $isBind,"createTime": ${createTime != null ? '${json.encode(createTime)}' : 'null'},"updateTime": ${updateTime != null ? '${json.encode(updateTime)}' : 'null'}}';
   }
 }
 
 class Device extends BaseModel {
-  int deviceType;
+  int deviceTypeId;
   int status;
   String deviceId;
   String img;
+  String name;
 
-  Device.fromParams({this.deviceType, this.status, this.deviceId, this.img});
+  Device.fromParams(
+      {this.deviceTypeId, this.status, this.deviceId, this.img, this.name});
 
   Device.fromJson(jsonRes) {
-    deviceType = jsonRes['deviceType'];
+    deviceTypeId = jsonRes['deviceTypeId'];
     id = jsonRes['id'];
     status = jsonRes['status'];
     deviceId = jsonRes['deviceId'];
     img = jsonRes['img'];
+    name = jsonRes['name'];
     createTime = jsonRes['createTime'];
     updateTime = jsonRes['updateTime'];
   }
 
   @override
   String toString() {
-    return '{"deviceType": $deviceType,"id": $id,"status": $status,"deviceId": ${deviceId != null ? '${json.encode(deviceId)}' : 'null'},"img": ${img != null ? '${json.encode(img)}' : 'null'},"createTime": ${createTime != null ? '${json.encode(createTime)}' : 'null'},"updateTime": ${updateTime != null ? '${json.encode(updateTime)}' : 'null'}}';
+    return '{"deviceTypeId": $deviceTypeId,"id": $id,"status": $status,"name":$name ,"deviceId": ${deviceId != null ? '${json.encode(deviceId)}' : 'null'},"img": ${img != null ? '${json.encode(img)}' : 'null'},"createTime": ${createTime != null ? '${json.encode(createTime)}' : 'null'},"updateTime": ${updateTime != null ? '${json.encode(updateTime)}' : 'null'}}';
   }
 }

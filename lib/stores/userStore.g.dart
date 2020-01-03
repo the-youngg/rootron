@@ -77,23 +77,23 @@ mixin _$UserStore on _UserStore, Store {
     }, _$currentUserAtom, name: '${_$currentUserAtom.name}_set');
   }
 
-  final _$positionBindDoorListAtom =
-      Atom(name: '_UserStore.positionBindDoorList');
+  final _$positionBindDeviceListAtom =
+      Atom(name: '_UserStore.positionBindDeviceList');
 
   @override
-  Map<String, List<Door>> get positionBindDoorList {
-    _$positionBindDoorListAtom.context
-        .enforceReadPolicy(_$positionBindDoorListAtom);
-    _$positionBindDoorListAtom.reportObserved();
-    return super.positionBindDoorList;
+  Map<String, List<Device>> get positionBindDeviceList {
+    _$positionBindDeviceListAtom.context
+        .enforceReadPolicy(_$positionBindDeviceListAtom);
+    _$positionBindDeviceListAtom.reportObserved();
+    return super.positionBindDeviceList;
   }
 
   @override
-  set positionBindDoorList(Map<String, List<Door>> value) {
-    _$positionBindDoorListAtom.context.conditionallyRunInAction(() {
-      super.positionBindDoorList = value;
-      _$positionBindDoorListAtom.reportChanged();
-    }, _$positionBindDoorListAtom,
-        name: '${_$positionBindDoorListAtom.name}_set');
+  set positionBindDeviceList(Map<String, List<Device>> value) {
+    _$positionBindDeviceListAtom.context.conditionallyRunInAction(() {
+      super.positionBindDeviceList = value;
+      _$positionBindDeviceListAtom.reportChanged();
+    }, _$positionBindDeviceListAtom,
+        name: '${_$positionBindDeviceListAtom.name}_set');
   }
 }

@@ -8,7 +8,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
 import 'package:rootron/models/index.dart';
-import 'package:rootron/models/userInfo.dart';
+import 'package:rootron/models/positions.dart';
+import 'package:rootron/models/userHasHouseInfos.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/userStore.dart';
@@ -16,7 +17,6 @@ import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/LocalStore.dart';
 import 'package:rootron/utils/ProgressDialog.dart';
 import 'package:rootron/utils/ToastUtil.dart';
-import 'package:rootron/widgets/app.dart';
 
 enum DialogDemoAction {
   cancel,
@@ -352,54 +352,36 @@ class _LoginState extends State<Login> {
 
   ///todo 公共方法
   Future<void> getUserInfo(int userId) async {
-    /// 获取用户房屋信息
-    var url2 = '/houseInfos/?userId=$userId';
-    await Http.get(path: url2).then((res2) {
-      HouseInfoList houseInfos = HouseInfoList.fromJson(res2);
-
-      Map<String, List<Door>> map = Map();
-      var positionName1;
-      var positionName2;
-      var positionName3;
-      if (houseInfos.houses.length == 0) {
+    /// 获取渲染页面的 Map 数据
+    Map<String, List<Device>> map = Map();
+    var url1 = '/userHasHouseInfos/?userId=$userId';
+    await Http.get(path: url1).then((res1) {
+      UserHasHouseInfos userHasHouseInfos = UserHasHouseInfos.fromJson(res1);
+      if (userHasHouseInfos.userHasHouseInfos.length == 0) {
         return;
       }
+      userHasHouseInfos.userHasHouseInfos.forEach((infos) {
+        var url2 = '/houseInfos/${infos.houseInfoId}';
+        Http.get(path: url2).then((res2) {
+          HouseInfo houseInfo = HouseInfo.fromJson(res2);
+          if (houseInfo == null) {
+            return;
+          }
 
-      /// 遍历用户所拥有的房子
-      houseInfos.houses.forEach((house) {
-        // todo 房子没绑定用户，可以存起来提供给后面的绑定房子页面
-//      if (!house.isBind) {
-//        return;
-//      }
+          var url3 = '/positions/${houseInfo.positionId}';
+          Http.get(path: url3).then((res3) {
+            Position position = Position.fromJson(res3);
+            var pointer = position;
 
-        /// 获取level为0的信息
-        positionName1 = house.position.name;
-        map[positionName1] = house.position.doors;
-
-        /// 获取level为1的信息
-        if (house.position.positions.length == 0) {
-          return;
-        }
-        house.position.positions.forEach((position) {
-          positionName2 = position.name;
-          map[positionName1 + positionName2] = position.doors;
-
-          /// 获取level为2的信息
-          position.positions.forEach((position) {
-            positionName3 = position.name;
-            map[positionName1 + positionName2 + positionName3] = position.doors;
-
-            /// todo 获取level为...的信息
-            /// todo ...
+            while (pointer.parent != null) {
+              map[pointer.name] = pointer.devices;
+              pointer = pointer.parent;
+            }
+            Provider.of<UserStore>(context).positionBindDeviceList = map;
+            Provider.of<UserStore>(context).isLogin = true;
           });
         });
       });
-
-      Provider.of<UserStore>(context).positionBindDoorList = map;
-      Provider.of<UserStore>(context).isLogin = true;
-    }).catchError((error) {
-      print("获取房屋信息异常：$error");
-      ToastUtil.show(context: context, msg: "登录失败");
     });
   }
 }

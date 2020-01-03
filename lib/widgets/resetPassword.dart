@@ -166,7 +166,7 @@ class ResetPassword extends StatelessWidget {
   void _logOut(BuildContext context) {
     LocalStore.removeLocalStorage('auth');
     Provider.of<UserStore>(context).isLogin = false;
-    Provider.of<UserStore>(context).positionBindDoorList = {};
+    Provider.of<UserStore>(context).positionBindDeviceList = {};
     Global.token = "";
   }
 }

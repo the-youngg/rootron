@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
-import 'package:rootron/models/userInfo.dart';
+import 'package:rootron/models/positions.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
@@ -25,7 +25,7 @@ class _OpenDoorState extends State<OpenDoor> {
   String doorValue;
 
   List<String> positions;
-  List<Door> doors;
+  List<Device> devices;
 
   OpenStatus openStatus = OpenStatus.close;
 
@@ -34,11 +34,11 @@ class _OpenDoorState extends State<OpenDoor> {
   @override
   Widget build(BuildContext context) {
     UserStore userStore = Provider.of<UserStore>(context);
-    positions = userStore.positionBindDoorList.keys.toList();
+    positions = userStore.positionBindDeviceList.keys.toList();
     if (positionValue == null) {
-      doors = List();
+      devices = List();
     } else {
-      doors = userStore.positionBindDoorList[positionValue];
+      devices = userStore.positionBindDeviceList[positionValue];
     }
     return WillPopScope(
       onWillPop: _doubleClickBack,
@@ -102,7 +102,7 @@ class _OpenDoorState extends State<OpenDoor> {
                           });
                         },
                         items:
-                            doors.map<DropdownMenuItem<String>>((Door value) {
+                            devices.map<DropdownMenuItem<String>>((Device value) {
                           return DropdownMenuItem<String>(
                             value: value.id.toString(),
                             child: SizedBox(
@@ -263,7 +263,7 @@ class _OpenDoorState extends State<OpenDoor> {
       doorValue = null;
       positionValue = null;
     });
-    Provider.of<UserStore>(context).positionBindDoorList = {};
+    Provider.of<UserStore>(context).positionBindDeviceList = {};
     Global.token = "";
     Navigator.pushNamed(context, CommunityRoute.login);
   }

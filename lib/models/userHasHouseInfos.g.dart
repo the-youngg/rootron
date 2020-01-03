@@ -6,14 +6,14 @@ part of 'userHasHouseInfos.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-UserHasHouseInfos _$UserHasHouseInfosFromJson(Map<String, dynamic> json) {
-  return UserHasHouseInfos()
-    ..id = json['id'] as num
-    ..userId = json['userId'] as num
-    ..houseInfoId = json['houseInfoId'] as num;
+UserHasHouseInfo _$UserHasHouseInfoFromJson(Map<String, dynamic> json) {
+  return UserHasHouseInfo()
+    ..id = json['id'] as int
+    ..userId = json['userId'] as int
+    ..houseInfoId = json['houseInfoId'] as int;
 }
 
-Map<String, dynamic> _$UserHasHouseInfosToJson(UserHasHouseInfos instance) =>
+Map<String, dynamic> _$UserHasHouseInfoToJson(UserHasHouseInfo instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

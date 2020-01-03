@@ -1,5 +1,5 @@
 import 'package:mobx/mobx.dart';
-import 'package:rootron/models/userInfo.dart';
+import 'package:rootron/models/positions.dart';
 
 part 'doorStore.g.dart';
 
@@ -16,5 +16,5 @@ abstract class _DoorStore with Store {
   List<String> positions;
 
   @observable
-  List<Door> doors;
+  List<Device> devices;
 }

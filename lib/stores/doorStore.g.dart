@@ -60,20 +60,20 @@ mixin _$DoorStore on _DoorStore, Store {
     }, _$positionsAtom, name: '${_$positionsAtom.name}_set');
   }
 
-  final _$doorsAtom = Atom(name: '_DoorStore.doors');
+  final _$devicesAtom = Atom(name: '_DoorStore.devices');
 
   @override
-  List<Door> get doors {
-    _$doorsAtom.context.enforceReadPolicy(_$doorsAtom);
-    _$doorsAtom.reportObserved();
-    return super.doors;
+  List<Device> get devices {
+    _$devicesAtom.context.enforceReadPolicy(_$devicesAtom);
+    _$devicesAtom.reportObserved();
+    return super.devices;
   }
 
   @override
-  set doors(List<Door> value) {
-    _$doorsAtom.context.conditionallyRunInAction(() {
-      super.doors = value;
-      _$doorsAtom.reportChanged();
-    }, _$doorsAtom, name: '${_$doorsAtom.name}_set');
+  set devices(List<Device> value) {
+    _$devicesAtom.context.conditionallyRunInAction(() {
+      super.devices = value;
+      _$devicesAtom.reportChanged();
+    }, _$devicesAtom, name: '${_$devicesAtom.name}_set');
   }
 }
