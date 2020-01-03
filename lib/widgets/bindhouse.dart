@@ -1,7 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:rootron/stores/counter.dart';
+
+
+class _HouseItem {
+  _HouseItem(this.name, this.checkState);
+
+  final String name;
+
+  bool checkState;
+}
+
 
 class BindHouse extends StatefulWidget {
   @override
@@ -11,7 +18,6 @@ class BindHouse extends StatefulWidget {
 }
 
 class _BindHouseState extends State<BindHouse> {
-  final Counter counter = new Counter();
   bool _checkValue = false;
   final _houseList = <String>[
     '天龙小区2401',

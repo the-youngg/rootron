@@ -17,7 +17,7 @@ class BindUser extends StatefulWidget {
 }
 
 class _BindUserState extends State<BindUser> {
-  final RegisterStore registerStore = new RegisterStore();
+  final RegisterStore registerMobx = new RegisterStore();
   Timer timer; //倒计时的计时器
   TextEditingController mController = TextEditingController();
 
@@ -64,7 +64,7 @@ class _BindUserState extends State<BindUser> {
                   new Expanded(
                     child: TextField(
                       onChanged: (text) {
-                        registerStore.username = text;
+                        registerMobx.username = text;
                       },
                       decoration: InputDecoration(
                         hintText: '请输入用户名',
@@ -75,44 +75,46 @@ class _BindUserState extends State<BindUser> {
                   ),
                 ],
               ),
-              Row(
-                children: <Widget>[
-                  new Text(
-                    '密    码：',
-                    style: new TextStyle(
-                        fontSize: 16,
-                        color: Colors.teal,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      obscureText: registerStore.isObscureText,
-                      onChanged: (text) {
-                        registerStore.password = text;
-                      },
-                      decoration: InputDecoration(
-                        hintText: '请输入密码',
-                        hintStyle: new TextStyle(
-                            fontSize: 14, color: Colors.grey[400]),
-                        suffixIcon: GestureDetector(
-                          dragStartBehavior: DragStartBehavior.down,
-                          onTap: () {
-                            registerStore.isObscureText =
-                                !registerStore.isObscureText;
-                          },
-                          child: Icon(
-                            registerStore.isObscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            semanticLabel: registerStore.isObscureText
-                                ? 'hide password'
-                                : 'show password',
+              Observer(
+                builder: (_) => Row(
+                  children: <Widget>[
+                    new Text(
+                      '密    码：',
+                      style: new TextStyle(
+                          fontSize: 16,
+                          color: Colors.teal,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Expanded(
+                      child: TextField(
+                        obscureText: registerMobx.isObscureText,
+                        onChanged: (text) {
+                          registerMobx.password = text;
+                        },
+                        decoration: InputDecoration(
+                          hintText: '请输入密码',
+                          hintStyle: new TextStyle(
+                              fontSize: 14, color: Colors.grey[400]),
+                          suffixIcon: GestureDetector(
+                            dragStartBehavior: DragStartBehavior.down,
+                            onTap: () {
+                              registerMobx.isObscureText =
+                                  !registerMobx.isObscureText;
+                            },
+                            child: Icon(
+                              registerMobx.isObscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              semanticLabel: registerMobx.isObscureText
+                                  ? 'hide password'
+                                  : 'show password',
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Row(
                 children: <Widget>[
@@ -127,7 +129,7 @@ class _BindUserState extends State<BindUser> {
                     child: TextField(
                       keyboardType: TextInputType.phone,
                       onChanged: (text) {
-                        registerStore.tel = text;
+                        registerMobx.tel = text;
                       },
                       decoration: InputDecoration(
                         hintText: '请输入手机号',
@@ -145,15 +147,15 @@ class _BindUserState extends State<BindUser> {
                         //按钮禁用时的颜色
                         disabledTextColor: Colors.white,
                         //按钮禁用时的文本颜色
-                        textColor: registerStore.isSmsButtonEnable
+                        textColor: registerMobx.isSmsButtonEnable
                             ? Colors.white
                             : Colors.black.withOpacity(0.2),
                         //文本颜色
-                        color: registerStore.isSmsButtonEnable
+                        color: registerMobx.isSmsButtonEnable
                             ? Color(0xff44c5fe)
                             : Colors.grey.withOpacity(0.1),
                         //按钮的颜色
-                        splashColor: registerStore.isSmsButtonEnable
+                        splashColor: registerMobx.isSmsButtonEnable
                             ? Colors.white.withOpacity(0.1)
                             : Colors.transparent,
                         shape: StadiumBorder(side: BorderSide.none),
@@ -161,7 +163,7 @@ class _BindUserState extends State<BindUser> {
                           _sendSMSCode();
                         },
                         child: Text(
-                          '${registerStore.smsCodeButtonText}',
+                          '${registerMobx.smsCodeButtonText}',
                           style: TextStyle(
                             fontSize: 13,
                           ),
@@ -185,7 +187,7 @@ class _BindUserState extends State<BindUser> {
                       maxLength: 6,
                       keyboardType: TextInputType.number,
                       onChanged: (text) {
-                        registerStore.smsCode = text;
+                        registerMobx.smsCode = text;
                       },
                       decoration: InputDecoration(
                         hintText: '请输入验证码',
@@ -217,10 +219,17 @@ class _BindUserState extends State<BindUser> {
   }
 
   /// 发送验证码的方法
-  void _sendSMSCode() {
-    if (registerStore.isSmsButtonEnable) {
+  Future<void> _sendSMSCode() async {
+    var url = '/users/?tel=${registerMobx.tel}';
+    var users = await Http.get(path: url);
+    UserList userList = UserList.fromJson(users);
+    if (userList.users.length == 0) {
+      ToastUtil.show(context: context, msg: "该手机号不存在");
+      return;
+    }
+    if (registerMobx.isSmsButtonEnable) {
       ToastUtil.show(context: context, msg: "短信已发送, 默认：123456");
-      registerStore.isSmsButtonEnable = false;
+      registerMobx.isSmsButtonEnable = false;
       _initTimer();
 
       return;
@@ -231,14 +240,14 @@ class _BindUserState extends State<BindUser> {
 
   void _initTimer() {
     timer = new Timer.periodic(Duration(seconds: 1), (Timer timer) {
-      registerStore.count--;
-      if (registerStore.count == 0) {
+      registerMobx.count--;
+      if (registerMobx.count == 0) {
         timer.cancel();
-        registerStore.isSmsButtonEnable = true;
-        registerStore.count = 60;
-        registerStore.smsCodeButtonText = '发送验证码';
+        registerMobx.isSmsButtonEnable = true;
+        registerMobx.count = 60;
+        registerMobx.smsCodeButtonText = '发送验证码';
       } else {
-        registerStore.smsCodeButtonText = '重新发送(${registerStore.count})';
+        registerMobx.smsCodeButtonText = '重新发送(${registerMobx.count})';
       }
     });
   }
@@ -248,35 +257,27 @@ class _BindUserState extends State<BindUser> {
    * 绑定账号的方法
    */
   _bindUser(BuildContext context) async {
-    debugPrint(registerStore.username);
-    debugPrint(registerStore.password);
-    debugPrint(registerStore.tel);
-    debugPrint(registerStore.smsCode);
 
-    /// todo 1. 先验证短信验证码 2. 验证手机号是否注册过
-
-    if (registerStore.smsCode != '123456') {
+    if (registerMobx.smsCode != '123456') {
       ToastUtil.show(context: context, msg: "验证码错误或者已经过期，请重新发送");
       return;
     }
 
-    var url1 = '/users/?tel=${registerStore.tel}';
-    var users = await Http.get(path: url1);
+    var url = '/users/?tel=${registerMobx.tel}';
+    var users = await Http.get(path: url);
     UserList userList = UserList.fromJson(users);
-    if (userList.users.length != 0) {
-      ToastUtil.show(context: context, msg: "该手机号已经注册。");
+    if (userList.users.length == 0) {
+      ToastUtil.show(context: context, msg: "该手机号不存在");
       return;
     }
+    User user = userList.users.first;
 
-    const url2 = '/users';
+    var url1 = '/users/${user.id}';
     var data = {
-      "username": registerStore.username,
-      "password": registerStore.password,
-      "tel": registerStore.tel,
+      "username": registerMobx.username,
+      "password": registerMobx.password
     };
-    await Http.post(path: url2, data: data).then((res) {
-      ToastUtil.show(context: context, msg: "绑定成功");
-      Future.delayed(Duration(milliseconds: 500));
+    Http.patch(path: url1, data: data).then((res) {
       Navigator.pushNamed(context, CommunityRoute.bindHouse);
     }).catchError((error) {
       ToastUtil.show(context: context, msg: "绑定失败");
