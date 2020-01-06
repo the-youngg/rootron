@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
+import 'package:rootron/common/global.dart';
 import 'package:rootron/models/index.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/stores/registerStore.dart';
+import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/ToastUtil.dart';
 
@@ -257,7 +260,6 @@ class _BindUserState extends State<BindUser> {
    * 绑定账号的方法
    */
   _bindUser(BuildContext context) async {
-
     if (registerMobx.smsCode != '123456') {
       ToastUtil.show(context: context, msg: "验证码错误或者已经过期，请重新发送");
       return;
@@ -278,7 +280,19 @@ class _BindUserState extends State<BindUser> {
       "password": registerMobx.password
     };
     Http.patch(path: url1, data: data).then((res) {
-      Navigator.pushNamed(context, CommunityRoute.bindHouse);
+      var url2 = '/authenticate';
+      Http.post(path: url2, data: data).then((res) {
+        Auth auth = new Auth.fromJson(res);
+        Global.token = auth.token;
+        print("token: ${Global.token}");
+        Http.get(path: url1).then((data) {
+          User user = User.fromJson(data);
+          final userStore = Provider.of<UserStore>(context);
+          userStore.currentUser = user;
+          print(user.password);
+          Navigator.pushNamed(context, CommunityRoute.bindHouse);
+        });
+      });
     }).catchError((error) {
       ToastUtil.show(context: context, msg: "绑定失败");
     });

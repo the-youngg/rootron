@@ -302,15 +302,7 @@ class _LoginState extends State<Login> {
         Provider.of<UserStore>(context).currentUser = user;
       });
 
-      getUserInfo(auth.userId);
-      LocalStore.setLocalStorage('auth', decode).then((isOk) {
-        if (isOk) {
-          Navigator.popUntil(
-            context,
-            ModalRoute.withName(CommunityRoute.openDoor),
-          );
-        }
-      });
+      getUserInfo(auth.userId, decode);
     }).catchError((Object error) {
       print('Http is catch：$error');
       showDemoDialog<DialogDemoAction>(
@@ -351,7 +343,7 @@ class _LoginState extends State<Login> {
   }
 
   ///todo 公共方法
-  Future<void> getUserInfo(int userId) async {
+  Future<void> getUserInfo(int userId, String decode) async {
     /// 获取渲染页面的 Map 数据
     Map<String, List<Device>> map = Map();
     var url1 = '/userHasHouseInfos/?userId=$userId';
@@ -367,6 +359,14 @@ class _LoginState extends State<Login> {
           if (houseInfo == null) {
             return;
           }
+          if (!houseInfo.isBind) {
+            Provider.of<UserStore>(context).isLogin = true;
+            Navigator.popUntil(
+              context,
+              ModalRoute.withName(CommunityRoute.openDoor),
+            );
+            return;
+          }
 
           var url3 = '/positions/${houseInfo.positionId}';
           Http.get(path: url3).then((res3) {
@@ -379,6 +379,14 @@ class _LoginState extends State<Login> {
             }
             Provider.of<UserStore>(context).positionBindDeviceList = map;
             Provider.of<UserStore>(context).isLogin = true;
+            LocalStore.setLocalStorage('auth', decode).then((isOk) {
+              if (isOk) {
+                Navigator.popUntil(
+                  context,
+                  ModalRoute.withName(CommunityRoute.openDoor),
+                );
+              }
+            });
           });
         });
       });

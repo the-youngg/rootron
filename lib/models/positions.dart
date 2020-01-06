@@ -75,21 +75,37 @@ class HouseInfo extends BaseModel {
   int userId;
   int positionId;
   bool isBind;
+  bool checkState;
 
-  HouseInfo.fromParams({this.userId, this.isBind, this.positionId});
+  HouseInfo.fromParams(
+      {this.userId, this.isBind, this.positionId, this.checkState});
 
   HouseInfo.fromJson(jsonRes) {
     id = jsonRes['id'];
     userId = jsonRes['userId'];
     positionId = jsonRes['positionId'];
     isBind = jsonRes['isBind'];
+    checkState = jsonRes['checkState'];
     createTime = jsonRes['createTime'];
     updateTime = jsonRes['updateTime'];
   }
 
   @override
   String toString() {
-    return '{"id": $id,"positionId":$positionId,"userId": $userId,"isBind": $isBind,"createTime": ${createTime != null ? '${json.encode(createTime)}' : 'null'},"updateTime": ${updateTime != null ? '${json.encode(updateTime)}' : 'null'}}';
+    return '{"id": $id,"positionId":$positionId,"userId": $userId,"checkState": $checkState,"isBind": $isBind,"createTime": ${createTime != null ? '${json.encode(createTime)}' : 'null'},"updateTime": ${updateTime != null ? '${json.encode(updateTime)}' : 'null'}}';
+  }
+}
+
+class HouseInfoList {
+  List<HouseInfo> houseInfoList;
+
+  HouseInfoList({this.houseInfoList});
+
+  factory HouseInfoList.fromJson(List<dynamic> parsedJson) {
+    List<HouseInfo> houseInfoList = new List<HouseInfo>();
+    houseInfoList = parsedJson.map((i) => HouseInfo.fromJson(i)).toList();
+
+    return new HouseInfoList(houseInfoList: houseInfoList);
   }
 }
 

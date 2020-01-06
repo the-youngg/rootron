@@ -96,4 +96,29 @@ mixin _$UserStore on _UserStore, Store {
     }, _$positionBindDeviceListAtom,
         name: '${_$positionBindDeviceListAtom.name}_set');
   }
+
+  final _$houseInfoListAtom = Atom(name: '_UserStore.houseInfoList');
+
+  @override
+  HouseInfoList get houseInfoList {
+    _$houseInfoListAtom.context.enforceReadPolicy(_$houseInfoListAtom);
+    _$houseInfoListAtom.reportObserved();
+    return super.houseInfoList;
+  }
+
+  @override
+  set houseInfoList(HouseInfoList value) {
+    _$houseInfoListAtom.context.conditionallyRunInAction(() {
+      super.houseInfoList = value;
+      _$houseInfoListAtom.reportChanged();
+    }, _$houseInfoListAtom, name: '${_$houseInfoListAtom.name}_set');
+  }
+
+  final _$getHouseInfoListAsyncAction = AsyncAction('getHouseInfoList');
+
+  @override
+  Future getHouseInfoList(int userId) {
+    return _$getHouseInfoListAsyncAction
+        .run(() => super.getHouseInfoList(userId));
+  }
 }
