@@ -4,6 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/models/positions.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
 
@@ -108,9 +109,9 @@ class _BindHouseState extends State<BindHouse> {
                                   .forEach((house) {
                                 if (house.isBind) {
                                   print(house.isBind);
-                                  var url = '/houseInfos/${house.id}';
-                                  var data = {"isBind": true};
-                                  Http.patch(path: url, data: data).then((res) {
+                                  UserService.updateHouseBindInfoByHouseId(
+                                          house.id, true)
+                                      .then((res) {
                                     Navigator.popUntil(
                                       context,
                                       ModalRoute.withName(

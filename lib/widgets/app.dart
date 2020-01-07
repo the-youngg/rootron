@@ -8,6 +8,7 @@ import 'package:rootron/models/index.dart';
 import 'package:rootron/models/positions.dart';
 import 'package:rootron/models/userHasHouseInfos.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/CommonLocalizationsDelegate.dart';
 import 'package:rootron/utils/HttpUtils.dart';
@@ -38,9 +39,7 @@ class _CommunityAppState extends State<CommunityApp> {
       Global.token = auth.token;
 
       ///todo 判断token是否过期
-      var url = '/users/${auth.userId}';
-      Http.get(path: url).then((data) {
-        User user = User.fromJson(data);
+      UserService.getUserByUserId(auth.userId).then((user) {
         Provider.of<UserStore>(context).currentUser = user;
         Provider.of<UserStore>(context).isLogin = true;
         Provider.of<UserStore>(context).userId = auth.userId;
@@ -59,23 +58,18 @@ class _CommunityAppState extends State<CommunityApp> {
   Future<void> _getUserInfo(int userId) async {
     /// 获取渲染页面的 Map 数据
     Map<String, List<Device>> map = Map();
-    var url1 = '/userHasHouseInfos/?userId=$userId';
-    await Http.get(path: url1).then((res1) {
-      UserHasHouseInfos userHasHouseInfos = UserHasHouseInfos.fromJson(res1);
+    UserService.getUserHasHouseInfosByUserId(userId).then((userHasHouseInfos) {
       if (userHasHouseInfos.userHasHouseInfos.length == 0) {
         return;
       }
       userHasHouseInfos.userHasHouseInfos.forEach((infos) {
-        var url2 = '/houseInfos/${infos.houseInfoId}';
-        Http.get(path: url2).then((res2) {
-          HouseInfo houseInfo = HouseInfo.fromJson(res2);
+        UserService.getHouseInfoByHouseId(infos.houseInfoId).then((houseInfo) {
           if (houseInfo == null) {
             return;
           }
 
-          var url3 = '/positions/${houseInfo.positionId}';
-          Http.get(path: url3).then((res3) {
-            Position position = Position.fromJson(res3);
+          UserService.getPositionByPositionId(houseInfo.positionId)
+              .then((position) {
             var pointer = position;
 
             while (pointer.parent != null) {

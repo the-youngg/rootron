@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/forgetPasswordStore.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
@@ -147,9 +148,11 @@ class ResetPassword extends StatelessWidget {
 
     ForgetPasswordStore forgetPasswordStore =
         Provider.of<ForgetPasswordStore>(context);
-    var url = '/users/${forgetPasswordStore.resetPasswordUser.id}';
-    var data = {"password": forgetPasswordMobx.confirmPassword};
-    Http.patch(path: url, data: data).then((res) {
+    UserService.updateUserInfoByUserId(
+      forgetPasswordStore.resetPasswordUser.id,
+      forgetPasswordStore.resetPasswordUser.username,
+      forgetPasswordMobx.confirmPassword,
+    ).then((res) {
       _logOut(context);
       Navigator.pushNamedAndRemoveUntil(
         context,

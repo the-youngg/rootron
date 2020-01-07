@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
 import 'package:rootron/models/index.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/services/login_service.dart';
+import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/registerStore.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
@@ -223,22 +225,21 @@ class _BindUserState extends State<BindUser> {
 
   /// 发送验证码的方法
   Future<void> _sendSMSCode() async {
-    var url = '/users/?tel=${registerMobx.tel}';
-    var users = await Http.get(path: url);
-    UserList userList = UserList.fromJson(users);
-    if (userList.users.length == 0) {
-      ToastUtil.show(context: context, msg: "该手机号不存在");
-      return;
-    }
-    if (registerMobx.isSmsButtonEnable) {
-      ToastUtil.show(context: context, msg: "短信已发送, 默认：123456");
-      registerMobx.isSmsButtonEnable = false;
-      _initTimer();
+    UserService.getUserByTel(registerMobx.tel).then((userList) {
+      if (userList.users.length == 0) {
+        ToastUtil.show(context: context, msg: "该手机号不存在");
+        return;
+      }
+      if (registerMobx.isSmsButtonEnable) {
+        ToastUtil.show(context: context, msg: "短信已发送, 默认：123456");
+        registerMobx.isSmsButtonEnable = false;
+        _initTimer();
 
-      return;
-    } else {
-      return;
-    }
+        return;
+      } else {
+        return;
+      }
+    });
   }
 
   void _initTimer() {
@@ -265,36 +266,34 @@ class _BindUserState extends State<BindUser> {
       return;
     }
 
-    var url = '/users/?tel=${registerMobx.tel}';
-    var users = await Http.get(path: url);
-    UserList userList = UserList.fromJson(users);
-    if (userList.users.length == 0) {
-      ToastUtil.show(context: context, msg: "该手机号不存在");
-      return;
-    }
-    User user = userList.users.first;
+    UserService.getUserByTel(registerMobx.tel).then((userList) {
+      if (userList.users.length == 0) {
+        ToastUtil.show(context: context, msg: "该手机号不存在");
+        return;
+      }
+      User user = userList.users.first;
+      UserService.updateUserInfoByUserId(
+        user.id,
+        registerMobx.username,
+        registerMobx.password,
+      ).then((res) {
+        LoginService.login(
+          registerMobx.username,
+          registerMobx.password,
+        ).then((auth) {
+          Global.token = auth.token;
+          print("token: ${Global.token}");
 
-    var url1 = '/users/${user.id}';
-    var data = {
-      "username": registerMobx.username,
-      "password": registerMobx.password
-    };
-    Http.patch(path: url1, data: data).then((res) {
-      var url2 = '/authenticate';
-      Http.post(path: url2, data: data).then((res) {
-        Auth auth = new Auth.fromJson(res);
-        Global.token = auth.token;
-        print("token: ${Global.token}");
-        Http.get(path: url1).then((data) {
-          User user = User.fromJson(data);
-          final userStore = Provider.of<UserStore>(context);
-          userStore.currentUser = user;
-          print(user.password);
-          Navigator.pushNamed(context, CommunityRoute.bindHouse);
+          UserService.getUserByUserId(user.id).then((user) {
+            final userStore = Provider.of<UserStore>(context);
+            userStore.currentUser = user;
+            print(user.password);
+            Navigator.pushNamed(context, CommunityRoute.bindHouse);
+          });
         });
+      }).catchError((error) {
+        ToastUtil.show(context: context, msg: "绑定失败");
       });
-    }).catchError((error) {
-      ToastUtil.show(context: context, msg: "绑定失败");
     });
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rootron/env.dart';
+import 'package:rootron/services/mock_service.dart';
 import 'package:rootron/stores/counter.dart';
 import 'package:rootron/stores/doorStore.dart';
 import 'package:rootron/stores/forgetPasswordStore.dart';
@@ -9,6 +11,8 @@ import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/widgets/app.dart';
 
 void main() async {
+  /// 后面将MockService改成RealService即可切换到真实后台的api
+//  Env.api = MockService();
   print("进入应用");
   WidgetsFlutterBinding.ensureInitialized();
 

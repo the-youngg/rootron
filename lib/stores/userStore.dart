@@ -1,8 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:mobx/mobx.dart';
+import 'package:rootron/env.dart';
 import 'package:rootron/models/index.dart';
 import 'package:rootron/models/positions.dart';
-import 'package:rootron/utils/HttpUtils.dart';
+import 'package:rootron/services/user_service.dart';
 
 part 'userStore.g.dart';
 
@@ -29,10 +29,9 @@ abstract class _UserStore with Store {
 
   @action
   Future getHouseInfoList(int userId) async {
-    var url = '/houseInfos/?userId=$userId';
-    await Future.delayed(Duration(milliseconds: 500));
-    var data = await Http.get(path: url);
-    houseInfoList = HouseInfoList.fromJson(data);
+    UserService.getHouseInfosByUserId(userId).then((data) {
+      houseInfoList = data;
+    });
   }
 }
 

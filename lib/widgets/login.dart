@@ -11,6 +11,8 @@ import 'package:rootron/models/index.dart';
 import 'package:rootron/models/positions.dart';
 import 'package:rootron/models/userHasHouseInfos.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/services/login_service.dart';
+import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
@@ -284,25 +286,16 @@ class _LoginState extends State<Login> {
     final ThemeData theme = Theme.of(context);
     final TextStyle dialogTextStyle =
         theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
-    const url = '/authenticate';
-    var data = {
-      "username": loginStore.username,
-      "password": loginStore.password
-    };
 
-    Http.post(path: url, data: data).then((res) {
-      var decode = json.encode(res);
-      Auth auth = new Auth.fromJson(res);
+    LoginService.login(loginStore.username, loginStore.password).then((auth) {
+      String encode = json.encode(auth);
       Global.token = auth.token;
-      print("token: ${Global.token}");
 
-      var url = '/users/${auth.userId}';
-      Http.get(path: url).then((data) {
-        User user = User.fromJson(data);
+      UserService.getUserByUserId(auth.userId).then((user) {
         Provider.of<UserStore>(context).currentUser = user;
       });
 
-      getUserInfo(auth.userId, decode);
+      getUserInfo(auth.userId, encode);
     }).catchError((Object error) {
       print('Http is catch：$error');
       showDemoDialog<DialogDemoAction>(
@@ -343,19 +336,16 @@ class _LoginState extends State<Login> {
   }
 
   ///todo 公共方法
-  Future<void> getUserInfo(int userId, String decode) async {
+  Future<void> getUserInfo(int userId, String auth) async {
     /// 获取渲染页面的 Map 数据
     Map<String, List<Device>> map = Map();
-    var url1 = '/userHasHouseInfos/?userId=$userId';
-    await Http.get(path: url1).then((res1) {
-      UserHasHouseInfos userHasHouseInfos = UserHasHouseInfos.fromJson(res1);
+
+    UserService.getUserHasHouseInfosByUserId(userId).then((userHasHouseInfos) {
       if (userHasHouseInfos.userHasHouseInfos.length == 0) {
         return;
       }
       userHasHouseInfos.userHasHouseInfos.forEach((infos) {
-        var url2 = '/houseInfos/${infos.houseInfoId}';
-        Http.get(path: url2).then((res2) {
-          HouseInfo houseInfo = HouseInfo.fromJson(res2);
+        UserService.getHouseInfoByHouseId(infos.houseInfoId).then((houseInfo) {
           if (houseInfo == null) {
             return;
           }
@@ -367,10 +357,8 @@ class _LoginState extends State<Login> {
             );
             return;
           }
-
-          var url3 = '/positions/${houseInfo.positionId}';
-          Http.get(path: url3).then((res3) {
-            Position position = Position.fromJson(res3);
+          UserService.getPositionByPositionId(houseInfo.positionId)
+              .then((position) {
             var pointer = position;
 
             while (pointer.parent != null) {
@@ -379,7 +367,7 @@ class _LoginState extends State<Login> {
             }
             Provider.of<UserStore>(context).positionBindDeviceList = map;
             Provider.of<UserStore>(context).isLogin = true;
-            LocalStore.setLocalStorage('auth', decode).then((isOk) {
+            LocalStore.setLocalStorage('auth', auth).then((isOk) {
               if (isOk) {
                 Navigator.popUntil(
                   context,

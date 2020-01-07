@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/models/index.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/forgetPasswordStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/ToastUtil.dart';
@@ -69,9 +70,8 @@ class ForgetPasswordPhone extends StatelessWidget {
       ToastUtil.show(context: context, msg: "请输入手机号");
       return;
     }
-    var url = '/users/?tel=${forgetPasswordMobx.tel}';
-    Http.get(path: url).then((users) {
-      UserList userList = UserList.fromJson(users);
+
+    UserService.getUserByTel(forgetPasswordMobx.tel).then((userList) {
       if (userList.users.length == 0) {
         ToastUtil.show(context: context, msg: "手机号不存在");
         return;

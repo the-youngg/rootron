@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
 import 'package:rootron/models/positions.dart';
 import 'package:rootron/routes/route.dart';
+import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/userStore.dart';
 import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/LocalStore.dart';
@@ -233,16 +234,13 @@ class _OpenDoorState extends State<OpenDoor> {
     });
     // 模拟等待
     await Future.delayed(Duration(seconds: 2));
-    const url = '/openRecord';
-    var data = {
-      "type": "一键开门",
-      "positionId": 1,
-      "doorId": doorValue,
-      "applicant": Provider.of<UserStore>(context).currentUser.id,
-      "createTime": DateTime.now().toString(),
-      "updateTime": DateTime.now().toString()
-    };
-    Http.post(path: url, data: data).then((res) {
+    UserService.openDoor(
+      "一键开门",
+      doorValue,
+      Provider.of<UserStore>(context).currentUser.id,
+      DateTime.now().toString(),
+      DateTime.now().toString(),
+    ).then((res) {
       ToastUtil.show(context: context, msg: "开门成功");
       setState(() {
         openStatus = OpenStatus.opened;
