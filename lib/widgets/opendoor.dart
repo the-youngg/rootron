@@ -51,89 +51,105 @@ class _OpenDoorState extends State<OpenDoor> {
           ),
           centerTitle: true,
         ),
-        body: new Center(
-          child: new Column(
-            children: <Widget>[
-              _openDoorButton(context),
-              Padding(
-                padding: EdgeInsets.only(
-                    left: 50.0, top: 30.0, right: 50.0, bottom: 20.0),
-                child: new Column(
-                  children: <Widget>[
-                    ListTile(
-                      title: new Text(
-                        '选择小区：',
-                      ),
-                      trailing: DropdownButton<String>(
-                        value: positionValue,
-                        hint: const Text('请选择'),
-                        onChanged: (String newValue) {
-                          if (doorValue != null) {
-                            setState(() {
-                              doorValue = null;
-                            });
-                          }
+        body: Column(
+          children: <Widget>[
+            _openDoorButton(context),
+            Padding(
+              padding: EdgeInsets.only(
+                  left: 50.0, top: 30.0, right: 50.0, bottom: 20.0),
+              child: new Column(
+                children: <Widget>[
+                  ListTile(
+                    title: new Text(
+                      '选择小区：',
+                    ),
+                    trailing: DropdownButton<String>(
+                      value: positionValue,
+                      hint: const Text('请选择'),
+                      onChanged: (String newValue) {
+                        if (doorValue != null) {
                           setState(() {
-                            positionValue = newValue;
+                            doorValue = null;
                           });
-                        },
-                        items: positions
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: SizedBox(
-                              width: 100.0,
-                              child: Text(value),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                        }
+                        setState(() {
+                          positionValue = newValue;
+                        });
+                      },
+                      items: positions
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: SizedBox(
+                            width: 100.0,
+                            child: Text(value),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    ListTile(
-                      title: new Text(
-                        '选择大门：',
-                      ),
-                      trailing: DropdownButton<String>(
-                        value: doorValue,
-                        hint: const Text('请选择'),
-                        onChanged: (String newValue) {
-                          setState(() {
-                            doorValue = newValue;
-                          });
-                        },
-                        items:
-                            devices.map<DropdownMenuItem<String>>((Device value) {
-                          return DropdownMenuItem<String>(
-                            value: value.id.toString(),
-                            child: SizedBox(
-                              width: 100.0,
-                              child: Text(value.name),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                  ),
+                  ListTile(
+                    title: new Text(
+                      '选择大门：',
                     ),
-                    SizedBox(
-                      height: 50.0,
+                    trailing: DropdownButton<String>(
+                      value: doorValue,
+                      hint: const Text('请选择'),
+                      onChanged: (String newValue) {
+                        setState(() {
+                          doorValue = newValue;
+                        });
+                      },
+                      items:
+                          devices.map<DropdownMenuItem<String>>((Device value) {
+                        return DropdownMenuItem<String>(
+                          value: value.id.toString(),
+                          child: SizedBox(
+                            width: 100.0,
+                            child: Text(value.name),
+                          ),
+                        );
+                      }).toList(),
                     ),
-                    Observer(
-                        builder: (_) => userStore.isLogin
-                            ? RaisedButton(
-                                color: Colors.green,
-                                onPressed: () {
-                                  _logOut();
-                                },
-                                child: Text(
-                                  '退出登录',
-                                  style: TextStyle(color: Colors.white),
+                  ),
+                  SizedBox(
+                    height: 50.0,
+                  ),
+                  Observer(
+                      builder: (_) => userStore.isLogin
+                          ? Column(
+                              children: <Widget>[
+                                RaisedButton(
+                                  color: Colors.green,
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, CommunityRoute.bindHouse);
+                                  },
+                                  child: Text(
+                                    '绑定房屋',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
-                              )
-                            : Text("")),
-                  ],
-                ),
+                                SizedBox(
+                                  height: 20.0,
+                                ),
+                                RaisedButton(
+                                  color: Colors.green,
+                                  onPressed: () {
+                                    _logOut();
+                                  },
+                                  child: Text(
+                                    '退出登录',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                )
+                              ],
+                            )
+                          : Text("")),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -145,7 +161,7 @@ class _OpenDoorState extends State<OpenDoor> {
    */
   Widget _openDoorButton(BuildContext context) {
     return new Container(
-      margin: EdgeInsets.only(top: (MediaQuery.of(context).size.height) / 4),
+      margin: EdgeInsets.only(top: (MediaQuery.of(context).size.height) / 5),
       width: 180.0,
       height: 180.0,
       decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
@@ -264,6 +280,7 @@ class _OpenDoorState extends State<OpenDoor> {
       positionValue = null;
     });
     Provider.of<UserStore>(context).positionBindDeviceList = {};
+    Provider.of<UserStore>(context).houseInfoList = null;
     Global.token = "";
     Navigator.pushNamed(context, CommunityRoute.login);
   }

@@ -27,17 +27,12 @@ abstract class _UserStore with Store {
   @observable
   HouseInfoList houseInfoList;
 
-  // fixme 进入开门页面的时候有时候会报错，是因为异步的情况下该值没做非空处理
   @action
   Future getHouseInfoList(int userId) async {
     var url = '/houseInfos/?userId=$userId';
+    await Future.delayed(Duration(milliseconds: 500));
     var data = await Http.get(path: url);
     houseInfoList = HouseInfoList.fromJson(data);
-    // todo 只显示未绑定房子
-
-    houseInfoList.houseInfoList.forEach((house) {
-      house.checkState = false;
-    });
   }
 }
 
