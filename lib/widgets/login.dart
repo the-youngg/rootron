@@ -7,15 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:rootron/common/global.dart';
-import 'package:rootron/models/index.dart';
 import 'package:rootron/models/positions.dart';
-import 'package:rootron/models/userHasHouseInfos.dart';
 import 'package:rootron/routes/route.dart';
 import 'package:rootron/services/login_service.dart';
 import 'package:rootron/services/user_service.dart';
 import 'package:rootron/stores/loginStore.dart';
 import 'package:rootron/stores/userStore.dart';
-import 'package:rootron/utils/HttpUtils.dart';
 import 'package:rootron/utils/LocalStore.dart';
 import 'package:rootron/utils/ProgressDialog.dart';
 import 'package:rootron/utils/ToastUtil.dart';
@@ -288,14 +285,21 @@ class _LoginState extends State<Login> {
         theme.textTheme.subhead.copyWith(color: theme.textTheme.caption.color);
 
     LoginService.login(loginStore.username, loginStore.password).then((auth) {
-      String encode = json.encode(auth);
+      String encodeAuth = json.encode(auth);
       Global.token = auth.token;
 
       UserService.getUserByUserId(auth.userId).then((user) {
         Provider.of<UserStore>(context).currentUser = user;
       });
 
-      getUserInfo(auth.userId, encode);
+      LocalStore.setLocalStorage('auth', encodeAuth).then((isOk) {
+        if (isOk) {
+          Navigator.popUntil(
+            context,
+            ModalRoute.withName(CommunityRoute.openDoor),
+          );
+        }
+      });
     }).catchError((Object error) {
       print('Http is catch：$error');
       showDemoDialog<DialogDemoAction>(
@@ -335,7 +339,7 @@ class _LoginState extends State<Login> {
     Navigator.pushNamed(context, CommunityRoute.forgetPasswordPhone);
   }
 
-  ///todo 公共方法
+  ///todo 下面的方法最后的路由跳转如果是push而不是pop的话可以将整个方法全部省略
   Future<void> getUserInfo(int userId, String auth) async {
     /// 获取渲染页面的 Map 数据
     Map<String, List<Device>> map = Map();

@@ -35,6 +35,8 @@ class Position extends BaseModel {
   HouseInfo houseInfo;
   Position parent;
 
+  Position();
+
   Position.fromParams(
       {this.level,
       this.houseFlag,
