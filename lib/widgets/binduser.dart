@@ -271,6 +271,10 @@ class _BindUserState extends State<BindUser> {
         ToastUtil.show(context: context, msg: "该手机号不存在");
         return;
       }
+      if(userList.users.first.username == registerMobx.username){
+        ToastUtil.show(context: context, msg: "该用户名已注册");
+        return;
+      }
       User user = userList.users.first;
       UserService.updateUserInfoByUserId(
         user.id,
